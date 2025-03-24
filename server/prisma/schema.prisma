@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,55 +8,46 @@ datasource db {
 }
 
 model User {
-  id String @id @default(uuid())
-  email String @unique
-  name String
-  password String
-  role Role
-  isBlocked Boolean @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations to Task (one-to-many)
-  createdTasks Task[] @relation("assigner")
-  assignedTasks Task[] @relation("assignee")
-
-  // Relations to Notification (one-to-many)
+  id            String         @id @default(uuid())
+  email         String         @unique
+  name          String
+  password      String
+  role          Role
+  isBlocked     Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
   notifications Notification[]
-  
+  assignedTasks Task[]         @relation("assignee")
+  createdTasks  Task[]         @relation("assigner")
+
   @@index([email])
 }
 
 model Task {
-  id String @id @default(uuid())
-  title String
+  id          String     @id @default(uuid())
+  title       String
   description String
-  priority Priority
-  status TaskStatus
-  deadline DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Foreign keys to User
-  assigner User @relation("assigner", fields: [assignerId], references: [id])
-  assignerId String
-
-  assignee User @relation("assignee", fields: [assigneeId], references: [id])
-  assigneeId String
+  priority    Priority
+  status      TaskStatus
+  deadline    DateTime
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  assignerId  String
+  assigneeId  String
+  assignee    User       @relation("assignee", fields: [assigneeId], references: [id])
+  assigner    User       @relation("assigner", fields: [assignerId], references: [id])
 
   @@index([assignerId])
   @@index([assigneeId])
 }
 
 model Notification {
-  id String @id @default(uuid())
-  content String
+  id        String   @id @default(uuid())
+  content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  // Foreign keys to User
-  sendTo User @relation(fields: [sendToId], references: [id])
-  sendToId String
+  sendToId  String
+  sendTo    User     @relation(fields: [sendToId], references: [id])
 
   @@index([sendToId])
 }
