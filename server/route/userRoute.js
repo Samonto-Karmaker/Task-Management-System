@@ -3,7 +3,7 @@ import {
     createUserValidationResult,
     createUserValidator,
 } from "../middleware/user/createUserValidator.middleware.js";
-import { createUserController } from "../controller/user.controller.js";
+import { createUserController, getAllUsersController } from "../controller/user.controller.js";
 
 const userRouter = Router();
 
@@ -13,5 +13,6 @@ userRouter.post(
     createUserValidationResult,
     createUserController
 );
+userRouter.get("/", getAllUsersController);
 
 export default userRouter;

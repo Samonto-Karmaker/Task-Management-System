@@ -29,3 +29,15 @@ export const createUser = async ({ name, email, password, role }) => {
         throw new ApiError(500, "Internal Server Error");
     }
 };
+
+export const getAllUsers = async () => {
+    try {
+        const users = await prisma.user.findMany({
+            select: { id: true, name: true, email: true, role: true },
+        })
+        return users;
+    } catch (error) {
+        console.error(error);
+        throw new ApiError(500, "Internal Server Error");
+    }
+};
