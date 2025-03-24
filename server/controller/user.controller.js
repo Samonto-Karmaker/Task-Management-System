@@ -63,3 +63,19 @@ export const loginController = async (req, res) => {
         );
     }
 };
+
+export const logoutController = async (req, res) => {
+    try {
+        res.clearCookie(process.env.COOKIE_NAME);
+        res.status(200).json(new ApiResponse(200, "Logout successful"));
+    } catch (error) {
+        console.error(error);
+        res.status(error.statusCode || 500).json(
+            new ApiResponse(
+                error.statusCode || 500,
+                error.message || "Internal Server Error",
+                error.errors || null
+            )
+        );
+    }
+};
