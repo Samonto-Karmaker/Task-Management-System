@@ -1,6 +1,7 @@
 import ApiResponse from "../util/ApiResponse.js";
 import { createUser, getAllUsers, login } from "../service/user.service.js";
 import jwt from "jsonwebtoken";
+import ms from "ms";
 
 export const createUserController = async (req, res) => {
     const { name, email, password, role } = req.body;
@@ -47,7 +48,7 @@ export const loginController = async (req, res) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
-            maxAge: process.env.JWT_EXPIRY,
+            maxAge: ms(process.env.JWT_EXPIRY),
         });
 
         res.status(200).json(new ApiResponse(200, "Login successful", user));
