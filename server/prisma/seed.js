@@ -21,6 +21,22 @@ async function main() {
     }
 
     console.log("✅ Permissions seeded successfully!");
+
+    const roles = [
+        { name: "ADMIN" },
+        { name: "DEV" },
+        { name: "PROJECT_MANAGER" },
+    ];
+
+    for (const role of roles) {
+        await prisma.role.upsert({
+            where: { name: role.name },
+            update: {},
+            create: role,
+        });
+    }
+
+    console.log("✅ Roles seeded successfully!");
 }
 
 main()
