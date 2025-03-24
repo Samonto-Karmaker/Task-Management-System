@@ -44,3 +44,15 @@ const revokePermissionFromRole = async () => {};
 const getRolePermissions = async () => {};
 
 const getRoles = async () => {};
+
+const getAllPermissions = async () => {
+    try {
+        const permissions = await prisma.permission.findMany(
+            { select: { id: true, name: true } }
+        );
+        return permissions;
+    } catch (error) {
+        console.error(error);
+        throw new ApiError(500, "Internal Server Error");
+    }
+};
