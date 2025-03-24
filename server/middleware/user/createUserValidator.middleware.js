@@ -4,8 +4,6 @@ import ApiError from "../../util/ApiError.js";
 
 export const createUserValidator = [
     check("name")
-        .isAlphanumeric()
-        .withMessage("Name must be alphanumeric")
         .isLength({ min: 2, max: 50 })
         .withMessage("Name must be between 2 and 50 characters")
         .trim(),
@@ -28,5 +26,5 @@ export const createUserValidationResult = (req, res, next) => {
     if (Object.keys(mappedErrors).length === 0) {
         return next();
     }
-    throw new ApiError(400, "Invalid user data", mappedErrors);
+    res.status(400).json(new ApiError(400, "Validation failed", mappedErrors));
 };
