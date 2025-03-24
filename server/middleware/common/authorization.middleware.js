@@ -25,3 +25,10 @@ export const checkAuth = (req, res, next) => {
             .json(new ApiResponse(500, "Internal Server Error"));
     }
 };
+
+export const checkRole = (roles) => (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+        return res.status(403).json(new ApiResponse(403, "Forbidden"));
+    }
+    next();
+}
