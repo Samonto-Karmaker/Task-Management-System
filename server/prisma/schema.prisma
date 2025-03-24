@@ -12,3 +12,75 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id String @id @default(uuid())
+  email String @unique
+  name String
+  password String
+  role Role
+  isBlocked Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations to Task (one-to-many)
+  createdTasks Task[] @relation("assigner")
+  assignedTasks Task[] @relation("assignee")
+
+  // Relations to Notification (one-to-many)
+  notifications Notification[]
+  
+  @@index([email])
+}
+
+model Task {
+  id String @id @default(uuid())
+  title String
+  description String
+  priority Priority
+  status TaskStatus
+  deadline DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Foreign keys to User
+  assigner User @relation("assigner", fields: [assignerId], references: [id])
+  assignerId String
+
+  assignee User @relation("assignee", fields: [assigneeId], references: [id])
+  assigneeId String
+
+  @@index([assignerId])
+  @@index([assigneeId])
+}
+
+model Notification {
+  id String @id @default(uuid())
+  content String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Foreign keys to User
+  sendTo User @relation(fields: [sendToId], references: [id])
+  sendToId String
+
+  @@index([sendToId])
+}
+
+enum Role {
+  DEV
+  PROJECT_MANAGER
+  ADMIN
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
