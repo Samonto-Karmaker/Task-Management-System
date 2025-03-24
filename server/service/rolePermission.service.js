@@ -45,7 +45,7 @@ const getRolePermissions = async () => {};
 
 const getRoles = async () => {};
 
-const getAllPermissions = async () => {
+export const getAllPermissions = async () => {
     try {
         const permissions = await prisma.permission.findMany(
             { select: { id: true, name: true } }
