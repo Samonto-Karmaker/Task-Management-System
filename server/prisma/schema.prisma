@@ -12,15 +12,17 @@ model User {
   email         String         @unique
   name          String
   password      String
-  role          Role
   isBlocked     Boolean        @default(false)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   notifications Notification[]
   assignedTasks Task[]         @relation("assignee")
   createdTasks  Task[]         @relation("assigner")
+  role          Role           @relation(fields: [roleId], references: [id])
+  roleId        String
 
-  @@index([email])
+  @@index([email]) // Index on email for quick lookups by email
+  @@index([roleId]) // Index on roleId for quick lookups by role
 }
 
 model Task {
@@ -37,8 +39,10 @@ model Task {
   assignee    User       @relation("assignee", fields: [assigneeId], references: [id])
   assigner    User       @relation("assigner", fields: [assignerId], references: [id])
 
-  @@index([assignerId])
-  @@index([assigneeId])
+  @@index([assignerId]) // Index on assignerId for quick lookups by assigner
+  @@index([assigneeId]) // Index on assigneeId for quick lookups by assignee
+  @@index([status]) // Index on status for quick filtering by task status
+  @@index([priority]) // Index on priority for quick filtering by task priority
 }
 
 model Notification {
@@ -49,14 +53,32 @@ model Notification {
   sendToId  String
   sendTo    User     @relation(fields: [sendToId], references: [id])
 
-  @@index([sendToId])
+  @@index([sendToId]) // Index on sendToId for quick lookups by recipient
+  @@index([createdAt]) // Index on createdAt for quick sorting/filtering by creation date
 }
 
-enum Role {
-  DEV
-  PROJECT_MANAGER
-  ADMIN
+model Role {
+  id             String           @id @default(uuid())
+  name           String           @unique
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @default(now())
+  users          User[]
+  permissions    Permission[]     @relation("RolePermissions")
+
+  @@index([name]) // Index on name for quick lookups by role name
 }
+
+model Permission {
+  id             String           @id @default(uuid())
+  name           String           @unique
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @default(now())
+  roles          Role[]           @relation("RolePermissions")
+
+  @@index([name]) // Index on name for quick lookups by permission name
+}
+
+
 
 enum Priority {
   LOW
