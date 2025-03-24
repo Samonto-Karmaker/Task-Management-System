@@ -1,5 +1,6 @@
 import ApiError from "../util/ApiError.js";
 import { prisma } from "../db/setupDB.js";
+import bcrypt from "bcrypt";
 
 export const createUser = async ({ name, email, password, role }) => {
     if (!name || !email || !password || !role) {
@@ -15,9 +16,11 @@ export const createUser = async ({ name, email, password, role }) => {
             throw new ApiError(400, "User already exists");
         }
 
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         // Create user
         const newUser = await prisma.user.create({
-            data: { name, email, password, role },
+            data: { name, email, password: hashedPassword, role },
         });
 
         return newUser;
