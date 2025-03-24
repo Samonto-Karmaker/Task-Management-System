@@ -1,5 +1,6 @@
 import ApiResponse from "../util/ApiResponse.js";
-import { createUser, getAllUsers } from "../service/user.service.js";
+import { createUser, getAllUsers, login } from "../service/user.service.js";
+import jwt from "jsonwebtoken";
 
 export const createUserController = async (req, res) => {
     const { name, email, password, role } = req.body;
@@ -22,6 +23,34 @@ export const getAllUsersController = async (req, res) => {
     try {
         const users = await getAllUsers();
         res.status(200).json(new ApiResponse(200, "Users retrieved", users));
+    } catch (error) {
+        console.error(error);
+        res.status(error.statusCode || 500).json(
+            new ApiResponse(
+                error.statusCode || 500,
+                error.message || "Internal Server Error",
+                error.errors || null
+            )
+        );
+    }
+};
+
+export const loginController = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const user = await login({ email, password });
+        const token = jwt.sign(user, process.env.JWT_SECRET, {
+            expiresIn: process.env.JWT_EXPIRY,
+        });
+
+        res.cookie(process.env.COOKIE_NAME, token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: process.env.JWT_EXPIRY,
+        });
+
+        res.status(200).json(new ApiResponse(200, "Login successful", user));
     } catch (error) {
         console.error(error);
         res.status(error.statusCode || 500).json(
