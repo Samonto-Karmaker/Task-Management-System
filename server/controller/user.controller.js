@@ -48,6 +48,7 @@ export const loginController = async (req, res) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
+            signed: true,
             maxAge: ms(process.env.JWT_EXPIRY),
         });
 
