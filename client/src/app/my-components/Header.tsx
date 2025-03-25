@@ -9,9 +9,11 @@ export default function Header() {
                 <h1 className="text-2xl font-bold">Task Management System</h1>
                 <ul className="flex space-x-4">
                     <li>
-                        <Button className="hover:cursor-pointer hover:text-gray-300">
-                            <House />
-                        </Button>
+                        <Link href="/">
+                            <Button className="hover:cursor-pointer hover:text-gray-300">
+                                <House />
+                            </Button>
+                        </Link>
                     </li>
                     <li>
                         <Link href="/login">
