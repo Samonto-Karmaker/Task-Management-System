@@ -2,6 +2,7 @@
 
 import apiClient from "@/lib/apiClient";
 import { ApiResponse } from "@/types/api-response";
+import { User } from "@/types/user";
 import {
     createContext,
     ReactNode,
@@ -10,17 +11,6 @@ import {
     SetStateAction,
     useEffect,
 } from "react";
-
-// User type definition
-interface User {
-    id: string;
-    email: string;
-    name: string;
-    roleId: string;
-    isBlocked: boolean;
-    createdAt: string;
-    updatedAt: string;
-}
 
 // Context type definition
 interface UserContextType {
