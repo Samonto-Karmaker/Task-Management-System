@@ -25,7 +25,12 @@ userRouter.post(
     createUserValidationResult,
     createUserController
 );
-userRouter.get("/", checkAuth, getAllUsersController);
+userRouter.get(
+    "/",
+    checkAuth,
+    checkRole(UserPermissions.VIEW_USERS),
+    getAllUsersController
+);
 userRouter.post("/login", loginController);
 userRouter.delete("/logout", logoutController);
 
