@@ -13,12 +13,14 @@ import {
     checkAuth,
     checkRole,
 } from "../middleware/common/authorization.middleware.js";
+import { UserPermissions } from "../util/constant.js";
 
 const userRouter = Router();
 
 userRouter.post(
     "/",
     checkAuth,
+    checkRole(UserPermissions.CREATE_USER),
     createUserValidator,
     createUserValidationResult,
     createUserController

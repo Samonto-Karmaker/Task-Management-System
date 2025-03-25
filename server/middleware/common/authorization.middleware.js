@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import ApiResponse from "../../util/ApiResponse.js";
+import { prisma } from "../../db/setupDB.js";
 
 export const checkAuth = (req, res, next) => {
     const cookies = req.signedCookies;
@@ -26,9 +27,28 @@ export const checkAuth = (req, res, next) => {
     }
 };
 
-export const checkRole = (roles) => (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-        return res.status(403).json(new ApiResponse(403, "Forbidden"));
+export const checkRole = (requiredPermission) => async (req, res, next) => {
+    const userRoleId = req.user.roleId;
+    try {
+        const userRole = await prisma.role.findUnique({
+            where: { id: userRoleId },
+            select: { permissions: true },
+        });
+        if (!userRole) {
+            return res.status(401).json(new ApiResponse(401, "Unauthorized"));
+        }
+
+        const userPermissions = userRole.permissions.map(
+            (permission) => permission.name
+        );
+        if (!userPermissions.includes(requiredPermission)) {
+            return res.status(403).json(new ApiResponse(403, "Forbidden"));
+        }
+        next();
+    } catch (error) {
+        console.error(error);
+        return res
+            .status(500)
+            .json(new ApiResponse(500, "Internal Server Error"));
     }
-    next();
 }
