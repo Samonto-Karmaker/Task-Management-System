@@ -53,3 +53,11 @@ export const logoutController = async (req, res) => {
         finalResErrorHandler(error, res);
     }
 };
+
+export const getLoggedInUserController = (req, res) => {
+    const loggedInUser = {
+        ...req.user,
+        password: undefined,
+    };
+    res.status(200).json(new ApiResponse(200, "User retrieved", loggedInUser));
+};

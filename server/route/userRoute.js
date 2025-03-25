@@ -6,6 +6,7 @@ import {
 import {
     createUserController,
     getAllUsersController,
+    getLoggedInUserController,
     loginController,
     logoutController,
 } from "../controller/user.controller.js";
@@ -32,6 +33,7 @@ userRouter.get(
     getAllUsersController
 );
 userRouter.post("/login", loginController);
-userRouter.delete("/logout", logoutController);
+userRouter.delete("/logout", checkAuth, logoutController);
+userRouter.get("/me", checkAuth, getLoggedInUserController);
 
 export default userRouter;
