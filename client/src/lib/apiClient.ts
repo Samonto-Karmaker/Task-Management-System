@@ -22,6 +22,7 @@ class ApiClient {
             method: method,
             headers: defaultHeaders,
             body: body ? JSON.stringify(body) : undefined,
+            credentials: "include",
         });
 
         const result = await response.json();

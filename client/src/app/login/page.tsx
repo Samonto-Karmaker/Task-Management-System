@@ -8,10 +8,12 @@ import apiClient from "@/lib/apiClient";
 import { ApiResponse } from "@/types/api-response";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/components/custom/hooks/useUser";
 
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const { setUser } = useUser();
 
     const router = useRouter();
 
@@ -24,7 +26,7 @@ export default function Login() {
                 password,
             });
             if (loginResponse.success) {
-                console.log(loginResponse.data);
+                setUser(loginResponse.data);
                 alert("Login successful!");
                 router.push("/");
             } else {
