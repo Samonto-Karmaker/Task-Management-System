@@ -1,9 +1,21 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { FormEvent, useState } from "react";
 
 export default function Login() {
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        console.log(email, password);
+    };
+
     return (
         <div className="max-w-md mx-auto">
             <Card>
@@ -13,14 +25,19 @@ export default function Login() {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <form className="space-y-4">
+                    <form className="space-y-4" onSubmit={handleSubmit}>
                         <div className="space-y-2">
                             <Label htmlFor="email">Email</Label>
                             <Input
                                 type="email"
                                 id="email"
                                 name="email"
+                                placeholder="mail@site.com"
+                                required
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 className="w-full border border-gray-300 rounded px-2 py-1"
+                                aria-label="Email"
                             />
                         </div>
                         <div className="space-y-2">
@@ -29,7 +46,12 @@ export default function Login() {
                                 type="password"
                                 id="password"
                                 name="password"
+                                placeholder="********"
+                                required
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 className="w-full border border-gray-300 rounded px-2 py-1"
+                                aria-label="Password"
                             />
                         </div>
                         <Button
