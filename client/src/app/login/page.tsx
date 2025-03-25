@@ -7,10 +7,13 @@ import { Label } from "@/components/ui/label";
 import apiClient from "@/lib/apiClient";
 import { ApiResponse } from "@/types/api-response";
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
+    const router = useRouter();
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -23,6 +26,7 @@ export default function Login() {
             if (loginResponse.success) {
                 console.log(loginResponse.data);
                 alert("Login successful!");
+                router.push("/");
             } else {
                 console.error(loginResponse.message);
                 alert("An error occurred. Please try again later.");
