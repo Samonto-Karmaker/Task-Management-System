@@ -1,7 +1,7 @@
 import ApiError from "../util/ApiError.js";
 import { prisma } from "../db/setupDB.js";
 
-const createCustomRoles = async (name, permissionIds) => {
+export const createCustomRoles = async (name, permissionIds) => {
     if (!name || !permissionIds) {
         throw new ApiError(400, "Missing required fields");
     }

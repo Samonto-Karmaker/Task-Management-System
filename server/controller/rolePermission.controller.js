@@ -1,4 +1,4 @@
-import { getAllPermissions, getRolePermissions } from "../service/rolePermission.service.js";
+import { createCustomRoles, getAllPermissions, getRolePermissions } from "../service/rolePermission.service.js";
 import ApiResponse from "../util/ApiResponse.js";
 
 export const getAllPermissionsController = async (req, res) => {
@@ -33,3 +33,20 @@ export const getRolePermissionsController = async (req, res) => {
         );
     }
 };
+
+export const createCustomRolesController = async (req, res) => {
+    const { name, permissions } = req.body;
+    try {
+        const newRole = await createCustomRoles(name, permissions);
+        res.status(201).json(new ApiResponse(201, "Role created", newRole));
+    } catch (error) {
+        console.error(error);
+        res.status(error.statusCode || 500).json(
+            new ApiResponse(
+                error.statusCode || 500,
+                error.message || "Internal Server Error",
+                error.errors || null
+            )
+        );
+    }
+}
