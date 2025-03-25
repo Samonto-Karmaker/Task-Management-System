@@ -2,6 +2,7 @@ import ApiResponse from "../util/ApiResponse.js";
 import { createUser, getAllUsers, login } from "../service/user.service.js";
 import jwt from "jsonwebtoken";
 import ms from "ms";
+import { finalResErrorHandler } from "../util/finalResErrorHandler.js";
 
 export const createUserController = async (req, res) => {
     const { name, email, password, role } = req.body;
@@ -9,14 +10,7 @@ export const createUserController = async (req, res) => {
         const newUser = await createUser({ name, email, password, role });
         res.status(201).json(new ApiResponse(201, "User created", newUser));
     } catch (error) {
-        console.error(error);
-        res.status(error.statusCode || 500).json(
-            new ApiResponse(
-                error.statusCode || 500,
-                error.message || "Internal Server Error",
-                error.errors || null
-            )
-        );
+        finalResErrorHandler(error, res);
     }
 };
 
@@ -25,14 +19,7 @@ export const getAllUsersController = async (req, res) => {
         const users = await getAllUsers();
         res.status(200).json(new ApiResponse(200, "Users retrieved", users));
     } catch (error) {
-        console.error(error);
-        res.status(error.statusCode || 500).json(
-            new ApiResponse(
-                error.statusCode || 500,
-                error.message || "Internal Server Error",
-                error.errors || null
-            )
-        );
+        finalResErrorHandler(error, res);
     }
 };
 
@@ -54,14 +41,7 @@ export const loginController = async (req, res) => {
 
         res.status(200).json(new ApiResponse(200, "Login successful", user));
     } catch (error) {
-        console.error(error);
-        res.status(error.statusCode || 500).json(
-            new ApiResponse(
-                error.statusCode || 500,
-                error.message || "Internal Server Error",
-                error.errors || null
-            )
-        );
+        finalResErrorHandler(error, res);
     }
 };
 
@@ -70,13 +50,6 @@ export const logoutController = async (req, res) => {
         res.clearCookie(process.env.COOKIE_NAME);
         res.status(200).json(new ApiResponse(200, "Logout successful"));
     } catch (error) {
-        console.error(error);
-        res.status(error.statusCode || 500).json(
-            new ApiResponse(
-                error.statusCode || 500,
-                error.message || "Internal Server Error",
-                error.errors || null
-            )
-        );
+        finalResErrorHandler(error, res);
     }
 };
