@@ -13,7 +13,7 @@ import { useUser } from "@/components/custom/hooks/useUser";
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const { setUser } = useUser();
+    const { user, setUser } = useUser();
 
     const router = useRouter();
 
@@ -38,6 +38,18 @@ export default function Login() {
             alert("An error occurred. Please try again later.");
         }
     };
+
+    if (user) {
+        return (
+            <div className="text-center text-2xl text-red-500 font-bold">
+                You are already logged in. Go to{" "}
+                <Button className="text-blue-500" onClick={() => router.push("/")}>
+                    Home
+                </Button>{" "}
+                page.
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-md mx-auto">

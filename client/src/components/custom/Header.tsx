@@ -4,9 +4,20 @@ import { Button } from "@/components/ui/button";
 import { House } from "lucide-react";
 import Link from "next/link";
 import { useUser } from "./hooks/useUser";
+import apiClient from "@/lib/apiClient";
 
 export default function Header() {
-    const { user } = useUser();
+    const { user, setUser } = useUser();
+
+    const handleLogout = async () => {
+        try {
+            await apiClient.delete("/logout");
+            setUser(null);
+        } catch (error) {
+            console.error(error);
+            alert("Failed to logout");
+        }
+    }
 
     return (
         <header className="bg-gray-800 text-white py-4">
@@ -22,7 +33,10 @@ export default function Header() {
                     </li>
                     {user ? (
                         <li>
-                            <Button className="hover:cursor-pointer hover:text-gray-300">
+                            <Button 
+                                className="hover:cursor-pointer hover:text-gray-300"
+                                onClick={handleLogout}
+                            >
                                 Logout
                             </Button>
                         </li>
