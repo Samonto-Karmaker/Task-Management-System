@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { House } from "lucide-react";
+import Link from "next/link";
 
 export default function Header() {
     return (
@@ -13,9 +14,11 @@ export default function Header() {
                         </Button>
                     </li>
                     <li>
-                        <Button className="hover:cursor-pointer hover:text-gray-300">
-                            Login
-                        </Button>
+                        <Link href="/login">
+                            <Button className="hover:cursor-pointer hover:text-gray-300">
+                                Login
+                            </Button>
+                        </Link>
                     </li>
                 </ul>
             </nav>
