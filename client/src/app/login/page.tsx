@@ -4,16 +4,33 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import apiClient from "@/lib/apiClient";
+import { ApiResponse } from "@/types/api-response";
 import { FormEvent, useState } from "react";
 
 export default function Login() {
-
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(email, password);
+
+        try {
+            const loginResponse: ApiResponse = await apiClient.post("/login", {
+                email,
+                password,
+            });
+            if (loginResponse.success) {
+                console.log(loginResponse.data);
+                alert("Login successful!");
+            } else {
+                console.error(loginResponse.message);
+                alert("An error occurred. Please try again later.");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("An error occurred. Please try again later.");
+        }
     };
 
     return (
