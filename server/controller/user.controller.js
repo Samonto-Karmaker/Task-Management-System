@@ -5,9 +5,9 @@ import ms from "ms";
 import { finalResErrorHandler } from "../util/finalResErrorHandler.js";
 
 export const createUserController = async (req, res) => {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, roleId } = req.body;
     try {
-        const newUser = await createUser({ name, email, password, role });
+        const newUser = await createUser({ name, email, password, roleId });
         res.status(201).json(new ApiResponse(201, "User created", newUser));
     } catch (error) {
         finalResErrorHandler(error, res);

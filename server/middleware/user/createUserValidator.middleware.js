@@ -1,6 +1,6 @@
 import { check, validationResult } from "express-validator";
-import { Role } from "../../util/constant.js";
 import ApiError from "../../util/ApiError.js";
+import { prisma } from "../../db/setupDB.js";
 
 export const createUserValidator = [
     check("name")
@@ -15,9 +15,17 @@ export const createUserValidator = [
         )
         .isLength({ min: 8 })
         .withMessage("Password must be at least 8 characters"),
-    check("role")
-        .isIn(Object.values(Role))
-        .withMessage("Role must be one of DEV, PROJECT_MANAGER, ADMIN"),
+    check("roleId")
+        .isUUID()
+        .withMessage("Role ID must be a valid UUID")
+        .custom(async (value) => {
+            const existingRole = await prisma.role.findUnique({
+                where: { id: value },
+            });
+            if (!existingRole) {
+                throw new ApiError(400, "Role does not exist");
+            }
+        })
 ];
 
 export const createUserValidationResult = (req, res, next) => {

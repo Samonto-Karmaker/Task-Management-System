@@ -1,9 +1,3 @@
-export const Role = Object.freeze({
-  DEV: "DEV",
-  PROJECT_MANAGER: "PROJECT_MANAGER",
-  ADMIN: "ADMIN",
-});
-
 export const Priority = Object.freeze({
   LOW: "LOW",
   MEDIUM: "MEDIUM",

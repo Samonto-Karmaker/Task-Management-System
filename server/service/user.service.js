@@ -2,8 +2,8 @@ import ApiError from "../util/ApiError.js";
 import { prisma } from "../db/setupDB.js";
 import bcrypt from "bcrypt";
 
-export const createUser = async ({ name, email, password, role }) => {
-    if (!name || !email || !password || !role) {
+export const createUser = async ({ name, email, password, roleId }) => {
+    if (!name || !email || !password || !roleId) {
         throw new ApiError(400, "Missing required fields");
     }
     try {
@@ -20,7 +20,7 @@ export const createUser = async ({ name, email, password, role }) => {
 
         // Create user
         const newUser = await prisma.user.create({
-            data: { name, email, password: hashedPassword, role },
+            data: { name, email, password: hashedPassword, roleId },
         });
 
         return newUser;
