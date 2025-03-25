@@ -26,6 +26,8 @@ export const UserPermissions = Object.freeze({
   ASSIGN_TASK: "ASSIGN_TASK",
   VIEW_TASK: "VIEW_TASK",
   UPDATE_TASK_STATUS: "UPDATE_TASK_STATUS",
+
+  CREATE_ROLE: "CREATE_ROLE",
 });
 
 

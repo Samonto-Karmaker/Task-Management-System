@@ -1,4 +1,5 @@
 import { prisma } from "../db/setupDB.js";
+import { UserPermissions } from "../util/constant.js";
 
 /*
     Default roles and their permissions:
@@ -8,22 +9,9 @@ import { prisma } from "../db/setupDB.js";
         UPDATE_TASK_STATUS, ASSIGN_TASK, CREATE_TASK, DELETE_TASK, UPDATE_TASK
 */
 async function main() {
-    const permissions = [
-        { name: "CREATE_USER" },
-        { name: "BLOCK_USER" },
-        { name: "UPDATE_USER" },
-        { name: "VIEW_USERS" },
-        { name: "VIEW_USER" },
-        { name: "VIEW_TASK_ASSIGNEES" },
-        { name: "CREATE_TASK" },
-        { name: "DELETE_TASK" },
-        { name: "UPDATE_TASK" },
-        { name: "VIEW_TASKS" },
-        { name: "VIEW_ASSIGNED_TASK" },
-        { name: "ASSIGN_TASK" },
-        { name: "VIEW_TASK" },
-        { name: "UPDATE_TASK_STATUS" },
-    ];
+    const permissions = Object.values(UserPermissions).map((permission) => ({
+        name: permission,
+    }));
 
     for (const permission of permissions) {
         await prisma.permission.upsert({
@@ -45,22 +33,22 @@ async function main() {
         {
             name: "DEV",
             permissions: [
-                { name: "VIEW_ASSIGNED_TASK" },
-                { name: "VIEW_TASK" },
-                { name: "UPDATE_TASK_STATUS" },
+                { name: UserPermissions.VIEW_ASSIGNED_TASK },
+                { name: UserPermissions.VIEW_TASK },
+                { name: UserPermissions.UPDATE_TASK_STATUS },
             ],
         },
         {
             name: "PROJECT_MANAGER",
             permissions: [
-                { name: "VIEW_ASSIGNED_TASK" },
-                { name: "VIEW_TASK" },
-                { name: "VIEW_TASK_ASSIGNEES" },
-                { name: "UPDATE_TASK_STATUS" },
-                { name: "ASSIGN_TASK" },
-                { name: "CREATE_TASK" },
-                { name: "DELETE_TASK" },
-                { name: "UPDATE_TASK" },
+                { name: UserPermissions.VIEW_ASSIGNED_TASK },
+                { name: UserPermissions.VIEW_TASK },
+                { name: UserPermissions.VIEW_TASK_ASSIGNEES },
+                { name: UserPermissions.UPDATE_TASK_STATUS },
+                { name: UserPermissions.ASSIGN_TASK },
+                { name: UserPermissions.CREATE_TASK },
+                { name: UserPermissions.DELETE_TASK },
+                { name: UserPermissions.UPDATE_TASK },
             ],
         },
     ];
@@ -80,7 +68,7 @@ async function main() {
                 },
             },
         });
-    }    
+    }
 
     console.log("✅ Roles and permissions seeded successfully!");
 }
