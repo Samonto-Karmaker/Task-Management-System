@@ -14,7 +14,6 @@ class ApiClient {
         const { method, body, headers } = options;
         const defaultHeaders = {
             "Content-Type": "application/json",
-            Credentials: "include",
             ...headers,
         };
 
