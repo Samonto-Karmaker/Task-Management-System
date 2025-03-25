@@ -1,6 +1,7 @@
 import { check, validationResult } from "express-validator";
 import ApiError from "../../util/ApiError.js";
 import { prisma } from "../../db/setupDB.js";
+import ApiResponse from "../../util/ApiResponse.js";
 
 export const createUserValidator = [
     check("name")
@@ -34,5 +35,5 @@ export const createUserValidationResult = (req, res, next) => {
     if (Object.keys(mappedErrors).length === 0) {
         return next();
     }
-    res.status(400).json(new ApiError(400, "Validation failed", mappedErrors));
+    res.status(400).json(new ApiResponse(400, "Validation failed", mappedErrors));
 };
