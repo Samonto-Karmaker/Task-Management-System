@@ -4,6 +4,8 @@ type FetchOptions = {
     headers?: Record<string, string>;
 };
 
+const BASE_URL = "http://localhost:5000/api/v1"; 
+
 class ApiClient {
     private async sendRequest<T>(
         url: string,
@@ -16,7 +18,7 @@ class ApiClient {
             ...headers,
         };
 
-        const response = await fetch(url, {
+        const response = await fetch(`${BASE_URL}${url}`, {
             ...options,
             method: method,
             headers: defaultHeaders,
