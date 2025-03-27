@@ -1,15 +1,3 @@
-export const Priority = Object.freeze({
-  LOW: "LOW",
-  MEDIUM: "MEDIUM",
-  HIGH: "HIGH",
-});
-
-export const TaskStatus = Object.freeze({
-  PENDING: "PENDING",
-  IN_PROGRESS: "IN_PROGRESS",
-  COMPLETED: "COMPLETED",
-});
-
 export const UserPermissions = Object.freeze({
   CREATE_USER: "CREATE_USER",
   BLOCK_USER: "BLOCK_USER",
