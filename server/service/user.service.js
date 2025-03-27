@@ -37,7 +37,7 @@ export const createUser = async ({ name, email, password, roleId }) => {
 export const getAllUsers = async () => {
     try {
         const users = await prisma.user.findMany({
-            select: { id: true, name: true, email: true, role: true },
+            select: { id: true, name: true, email: true, role: true, isBlocked: true },
         })
         return users;
     } catch (error) {

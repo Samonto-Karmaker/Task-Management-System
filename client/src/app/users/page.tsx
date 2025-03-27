@@ -9,11 +9,43 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { User } from "@/types/user";
-import { useState } from "react";
+import apiClient from "@/lib/apiClient";
+import { ApiResponse } from "@/types/api-response";
+import { useEffect, useState } from "react";
+
+interface UserBaseInfo {
+    id: string;
+    name: string;
+    email: string;
+    isBlocked: boolean;
+    role: {
+        id: string;
+        name: string;
+    }
+}
 
 export default function UserPage() {
-    const [users, setUsers] = useState<User[]>([]);
+    const [users, setUsers] = useState<UserBaseInfo[]>([]);
+    
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const response: ApiResponse = await apiClient.get("/");
+                if (response.success) {
+                    console.log(response.data);
+                    setUsers(response.data);
+                } else {
+                    console.error(response.message);
+                    alert(`Failed to fetch users: ${response.message}`);
+                }
+            } catch (error) {
+                console.error(error);
+                alert("An error occurred. Please try again later.");
+            }
+        }
+
+        fetchUsers();
+    }, [])
 
     const toggleBlock = (userId: string) => {
         setUsers(() => {
@@ -62,7 +94,7 @@ export default function UserPage() {
                                     {user.email}
                                 </TableCell>
                                 <TableCell className="p-3">
-                                    {user.permissionInfo.role}
+                                    {user.role.name}
                                 </TableCell>
                                 <TableCell className="p-3 text-center">
                                     <Button
