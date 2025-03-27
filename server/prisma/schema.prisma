@@ -30,7 +30,7 @@ model Task {
   title       String
   description String
   priority    Priority
-  status      TaskStatus
+  status      TaskStatus @default(PENDING)
   deadline    DateTime
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
