@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
     createCustomRolesController,
     getAllPermissionsController,
+    getAllRolesController,
     getRolePermissionsController,
 } from "../controller/rolePermission.controller.js";
 import {
@@ -13,6 +14,7 @@ import { UserPermissions } from "../util/constant.js";
 const rolePermissionRouter = Router();
 
 rolePermissionRouter.get("/", getAllPermissionsController);
+rolePermissionRouter.get("/roles", checkAuth, getAllRolesController);
 rolePermissionRouter.post(
     "/",
     checkAuth,

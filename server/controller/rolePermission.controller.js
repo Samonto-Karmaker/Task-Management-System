@@ -1,4 +1,4 @@
-import { createCustomRoles, getAllPermissions, getRolePermissions } from "../service/rolePermission.service.js";
+import { createCustomRoles, getAllPermissions, getAllRoles, getRolePermissions } from "../service/rolePermission.service.js";
 import ApiResponse from "../util/ApiResponse.js";
 import { finalResErrorHandler } from "../util/finalResErrorHandler.js";
 
@@ -30,3 +30,12 @@ export const createCustomRolesController = async (req, res) => {
         finalResErrorHandler(error, res);
     }
 }
+
+export const getAllRolesController = async (req, res) => {
+    try {
+        const roles = await getAllRoles();
+        res.status(200).json(new ApiResponse(200, "Roles retrieved", roles));
+    } catch (error) {
+        finalResErrorHandler(error, res);
+    }
+};

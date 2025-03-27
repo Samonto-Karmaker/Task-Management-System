@@ -61,7 +61,18 @@ export const getRolePermissions = async (roleId) => {
     }
 };
 
-const getRoles = async () => {};
+export const getAllRoles = async () => {
+    try {
+        const roles = await prisma.role.findMany({
+            select: { id: true, name: true },
+            orderBy: { name: 'asc' },
+        });
+        return roles;
+    } catch (error) {
+        console.error(error);
+        throw new ApiError(500, "Internal Server Error");
+    }
+};
 
 export const getAllPermissions = async () => {
     try {
