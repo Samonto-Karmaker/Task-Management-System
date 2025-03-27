@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Select from "react-select";
+import { useEffect, useState } from "react";
+import apiClient from "@/lib/apiClient";
+import { ApiResponse } from "@/types/api-response";
 
 export default function CreateRoleForm({
     isOpen,
@@ -12,14 +15,30 @@ export default function CreateRoleForm({
     isOpen: boolean;
     setIsOpen: (isOpen: boolean) => void;
 }) {
-    const permissions = [
-        { value: "create-user", label: "Create User" },
-        { value: "update-user", label: "Update User" },
-        { value: "delete-user", label: "Delete User" },
-        { value: "create-role", label: "Create Role" },
-        { value: "update-role", label: "Update Role" },
-        { value: "delete-role", label: "Delete Role" },
-    ];
+    const [permissions, setPermissions] = useState<
+        {
+            id: string;
+            name: string;
+        }[]
+    >([]);
+
+    useEffect(() => {
+        const fetchPermissions = async () => {
+            try {
+                const response: ApiResponse = await apiClient.get("/role-permission");
+                if (response.success) {
+                    console.log(response.data);
+                    setPermissions(response.data);
+                } else {
+                    console.error(response.message);
+                }
+            } catch (error) {
+                console.error("Error fetching permissions:", error);
+            }
+        }
+
+        fetchPermissions();
+    }, []);
 
     const customStyles = {
         control: (provided: any, state: any) => ({
@@ -83,7 +102,10 @@ export default function CreateRoleForm({
                                 <Label htmlFor="permissions">Permissions</Label>
                                 <Select
                                     isMulti
-                                    options={permissions}
+                                    options={permissions.map((permission) => ({
+                                        value: permission.id,
+                                        label: permission.name,
+                                    }))}
                                     styles={customStyles}
                                     className="focus:ring-2 focus:ring-blue-500"
                                     placeholder="Select permissions..."
