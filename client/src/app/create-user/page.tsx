@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import apiClient from "@/lib/apiClient";
 import { ApiResponse } from "@/types/api-response";
+import { useRouter } from "next/navigation";
 
 interface Role {
     id: number;
@@ -37,8 +38,11 @@ export default function CreateUserForm() {
         handleSubmit,
         watch,
         setValue,
+        setError,
         formState: { errors },
     } = useForm<FormData>();
+
+    const router = useRouter();
 
     useEffect(() => {
         const fetchRoles = async () => {
@@ -58,7 +62,53 @@ export default function CreateUserForm() {
     }, []);
 
     const onSubmit = async (data: FormData) => {
-        console.log("Form Data:", data);
+        try {
+            const response: ApiResponse = await apiClient.post("/", {
+                name: data.name,
+                email: data.email,
+                password: data.password,
+                roleId: data.roleId,
+            })
+
+            if (response.success) {
+                console.log("User created successfully");
+                setValue("name", "");
+                setValue("email", "");
+                setValue("password", "");
+                setValue("confirmPassword", "");
+                setValue("roleId", "");
+
+                setError("name", { message: "" });
+                setError("email", { message: "" });
+                setError("password", { message: "" });
+                setError("confirmPassword", { message: "" });
+                setError("roleId", { message: "" });
+
+                alert("User created successfully");
+
+                router.push("/users");
+            } else if (response.statusCode === 400 && response.data) {
+                const errors = response.data;
+                if (errors.name) {
+                    setError("name", { message: errors.name.msg });
+                }
+                if (errors.email) {
+                    setError("email", { message: errors.email.msg });
+                }
+                if (errors.password) {
+                    setError("password", { message: errors.password.msg });
+                }
+                if (errors.roleId) {
+                    setError("roleId", { message: errors.roleId.msg });
+                }
+            } else {
+                console.error("Error creating user:", response.message);
+                alert(`Error creating user: ${response.message}`);
+            }
+        } catch (error) {
+            console.error("Error creating user:", error);
+            alert("Error creating user");
+        }
     };
 
     return (
@@ -99,6 +149,11 @@ export default function CreateUserForm() {
                                     ))}
                                 </SelectContent>
                             </Select>
+                            {errors.roleId && (
+                                <p className="text-sm text-red-500">
+                                    {errors.roleId.message}
+                                </p>
+                            )}
                         </div>
 
                         {/* Name */}
@@ -109,6 +164,11 @@ export default function CreateUserForm() {
                                 placeholder="John Doe"
                                 {...register("name", { required: true })}
                             />
+                            {errors.name && (
+                                <p className="text-sm text-red-500">
+                                    {errors.name.message}
+                                </p>
+                            )}
                         </div>
 
                         {/* Email */}
@@ -120,6 +180,11 @@ export default function CreateUserForm() {
                                 placeholder="mail@site.com"
                                 {...register("email", { required: true })}
                             />
+                            {errors.email && (
+                                <p className="text-sm text-red-500">
+                                    {errors.email.message}
+                                </p>
+                            )}
                         </div>
 
                         {/* Password */}
@@ -131,6 +196,11 @@ export default function CreateUserForm() {
                                 placeholder="********"
                                 {...register("password", { required: true })}
                             />
+                            {errors.password && (
+                                <p className="text-sm text-red-500">
+                                    {errors.password.message}
+                                </p>
+                            )}
                         </div>
 
                         {/* Confirm Password */}
