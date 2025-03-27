@@ -48,12 +48,12 @@ export const getRolePermissions = async (roleId) => {
     try {
         const role = await prisma.role.findUnique({
             where: { id: roleId },
-            select: { permissions: { select: { id: true, name: true } } },
+            select: { permissions: { select: { id: true, name: true } }, name: true},
         });
         if (!role) {
             throw new ApiError(404, "Role not found");
         }
-        return role.permissions;
+        return { role: role.name, permissions: role.permissions };
     } catch (error) {
         console.error(error);
         if (error instanceof ApiError) throw error;

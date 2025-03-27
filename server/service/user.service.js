@@ -1,6 +1,7 @@
 import ApiError from "../util/ApiError.js";
 import { prisma } from "../db/setupDB.js";
 import bcrypt from "bcrypt";
+import { getRolePermissions } from "./rolePermission.service.js";
 
 export const createUser = async ({ name, email, password, roleId }) => {
     if (!name || !email || !password || !roleId) {
@@ -62,7 +63,10 @@ export const login = async ({ email, password }) => {
             throw new ApiError(401, "Invalid credentials");
         }
 
-        return user;
+        const permissions = await getRolePermissions(user.roleId);
+        const userWithPermissions = { ...user, permissions };
+
+        return userWithPermissions;
     } catch (error) {
         console.error(error);
         if (error instanceof ApiError) {
