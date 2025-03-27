@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "../components/custom/Header";
 import Providers from "@/components/custom/providers/Providers";
+import Sidebar from "@/components/custom/SiderBar";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -31,9 +32,12 @@ export default function RootLayout({
             >
                 <Providers>
                     <Header />
-                    <main className="container mx-auto px-4 py-8">
-                        {children}
-                    </main>
+                    <div className="flex">
+                        <Sidebar />
+                        <main className="container mx-auto px-4 py-8 flex-1">
+                            {children}
+                        </main>
+                    </div>
                 </Providers>
             </body>
         </html>
