@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Home, Bell, ListChecks, Users, Menu, X } from "lucide-react";
+import { Home, Bell, ListChecks, Menu, X, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useUser } from "./hooks/useUser";
+import { checkPermission } from "@/utils/checkPermission";
+import { User } from "@/types/user";
 
 const Sidebar = () => {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -28,19 +30,28 @@ const Sidebar = () => {
                 >
                     {isExpanded ? <X size={24} /> : <Menu size={24} />}
                 </Button>
-                <SidebarContent isExpanded={isExpanded} />
+                <SidebarContent user={user} isExpanded={isExpanded} />
             </aside>
         </div>
     );
 };
 
-const SidebarContent = ({ isExpanded = true }: { isExpanded?: boolean }) => {
+const SidebarContent = ({
+    user,
+    isExpanded = true,
+}: {
+    user: User;
+    isExpanded?: boolean;
+}) => {
     const links = [
         { name: "Home", href: "/", icon: Home },
-        { name: "User", href: "/users", icon: Users },
         { name: "Task", href: "/tasks", icon: ListChecks },
         { name: "Notifications", href: "/notifications", icon: Bell },
     ];
+
+    if (checkPermission(user, "USER")) {
+        links.push({ name: "User", href: "/users", icon: Users });
+    }
 
     return (
         <nav className="flex flex-col space-y-4">
