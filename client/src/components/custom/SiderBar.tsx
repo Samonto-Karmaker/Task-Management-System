@@ -12,16 +12,20 @@ const Sidebar = () => {
 
     const toggleSidebar = () => setIsExpanded(!isExpanded);
 
-    if (!user || !user.roleId) return <></>
+    if (!user || !user.roleId) return <></>;
 
     return (
         <div className="flex">
             <aside
-                className={`flex-col bg-gray-900 text-white h-screen p-4 transition-all ${
+                className={`flex flex-col bg-gray-900 text-white min-h-screen p-4 transition-all ${
                     isExpanded ? "w-60" : "w-16"
-                }`}
+                } sticky top-0`}
             >
-                <Button variant="ghost" className="mb-6" onClick={toggleSidebar}>
+                <Button
+                    variant="ghost"
+                    className="mb-6"
+                    onClick={toggleSidebar}
+                >
                     {isExpanded ? <X size={24} /> : <Menu size={24} />}
                 </Button>
                 <SidebarContent isExpanded={isExpanded} />
@@ -41,7 +45,11 @@ const SidebarContent = ({ isExpanded = true }: { isExpanded?: boolean }) => {
     return (
         <nav className="flex flex-col space-y-4">
             {links.map(({ name, href, icon: Icon }) => (
-                <Link key={name} href={href} className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-800">
+                <Link
+                    key={name}
+                    href={href}
+                    className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-800"
+                >
                     <Icon size={24} />
                     {isExpanded && <span>{name}</span>}
                 </Link>
