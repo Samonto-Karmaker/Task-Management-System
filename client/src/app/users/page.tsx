@@ -1,5 +1,7 @@
 "use client";
 
+import { useUser } from "@/components/custom/hooks/useUser";
+import Unauthorized from "@/components/custom/Unauthorized";
 import { Button } from "@/components/ui/button";
 import {
     Table,
@@ -11,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import apiClient from "@/lib/apiClient";
 import { ApiResponse } from "@/types/api-response";
+import { checkPermission } from "@/utils/checkPermission";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -27,6 +30,7 @@ interface UserBaseInfo {
 
 export default function UserPage() {
     const [users, setUsers] = useState<UserBaseInfo[]>([]);
+    const { user } = useUser();
     
     useEffect(() => {
         const fetchUsers = async () => {
@@ -45,8 +49,10 @@ export default function UserPage() {
             }
         }
 
-        fetchUsers();
-    }, [])
+        if (checkPermission(user, "USER")) {
+            fetchUsers();
+        }
+    }, [user]);
 
     const toggleBlock = (userId: string) => {
         setUsers(() => {
@@ -61,6 +67,10 @@ export default function UserPage() {
             });
         });
     };
+
+    if (!checkPermission(user, "USER")) {
+        return <Unauthorized />;
+    }
 
     return (
         <main className="container mx-auto px-4 py-8">

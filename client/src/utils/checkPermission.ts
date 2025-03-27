@@ -1,7 +1,7 @@
 import { User } from "@/types/user";
 
 export const checkPermission = (
-    user: User,
+    user: User | null,
     keywordOrPermission: string
 ): boolean => {
     if (!user || !user.roleId  || !user.permissionInfo) return false;

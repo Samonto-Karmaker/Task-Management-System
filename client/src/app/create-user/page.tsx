@@ -16,6 +16,9 @@ import { Button } from "@/components/ui/button";
 import apiClient from "@/lib/apiClient";
 import { ApiResponse } from "@/types/api-response";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/components/custom/hooks/useUser";
+import { checkPermission } from "@/utils/checkPermission";
+import Unauthorized from "@/components/custom/Unauthorized";
 
 interface Role {
     id: number;
@@ -31,6 +34,7 @@ interface FormData {
 }
 
 export default function CreateUserForm() {
+    const {user} = useUser();
     const [roles, setRoles] = useState<Role[]>([]);
 
     const {
@@ -58,8 +62,10 @@ export default function CreateUserForm() {
             }
         };
 
-        fetchRoles();
-    }, []);
+        if (checkPermission(user, "USER")) {
+            fetchRoles();
+        }
+    }, [user]);
 
     const onSubmit = async (data: FormData) => {
         try {
@@ -110,6 +116,10 @@ export default function CreateUserForm() {
             alert("Error creating user");
         }
     };
+
+    if (!checkPermission(user, "USER")) {
+        return <Unauthorized />;
+    }
 
     return (
         <div className="max-w-md mx-auto">
