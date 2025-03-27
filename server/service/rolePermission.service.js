@@ -5,7 +5,7 @@ export const createCustomRoles = async (name, permissionIds) => {
     if (!name || !permissionIds) {
         throw new ApiError(400, "Missing required fields");
     }
-    name = name.toUpperCase();
+    name = name.toUpperCase().split(" ").join("_");
     try {
         const existingRoles = await prisma.role.findUnique({
             where: { name },

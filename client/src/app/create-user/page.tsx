@@ -67,7 +67,7 @@ export default function CreateUserForm() {
         if (checkPermission(user, "USER")) {
             fetchRoles();
         }
-    }, [user]);
+    }, [user, isOpen]);
 
     const onSubmit = async (data: FormData) => {
         try {

@@ -15,17 +15,20 @@ export default function CreateRoleForm({
     isOpen: boolean;
     setIsOpen: (isOpen: boolean) => void;
 }) {
+    const [role, setRole] = useState<string>("");
+    const [selectedPermissions, setSelectedPermissions] = useState<
+        { value: string; label: string }[]
+    >([]);
     const [permissions, setPermissions] = useState<
-        {
-            id: string;
-            name: string;
-        }[]
+        { id: string; name: string }[]
     >([]);
 
     useEffect(() => {
         const fetchPermissions = async () => {
             try {
-                const response: ApiResponse = await apiClient.get("/role-permission");
+                const response: ApiResponse = await apiClient.get(
+                    "/role-permission"
+                );
                 if (response.success) {
                     console.log(response.data);
                     setPermissions(response.data);
@@ -35,7 +38,7 @@ export default function CreateRoleForm({
             } catch (error) {
                 console.error("Error fetching permissions:", error);
             }
-        }
+        };
 
         fetchPermissions();
     }, []);
@@ -77,6 +80,31 @@ export default function CreateRoleForm({
         }),
     };
 
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const requestBody = {
+            name: role,
+            permissionIds: selectedPermissions.map((permission) => permission.value),
+        }
+        try {
+            console.log(requestBody);
+            const response: ApiResponse = await apiClient.post("/role-permission/", requestBody);
+            if (response.success) {
+                console.log("Role created successfully");
+                setRole("");
+                setSelectedPermissions([]);
+                alert("Role created successfully");
+                setIsOpen(false);
+            } else {
+                console.error("Error creating role:", response.message);
+                alert(`Error creating role: ${response.message}`);
+            }
+        } catch (error) {
+            console.error("Error creating role:", error);
+            alert("Error creating role");
+        }
+    };
+
     return (
         <Dialog open={isOpen} onOpenChange={() => setIsOpen(false)}>
             <DialogContent className="max-w-lg w-full p-6">
@@ -90,11 +118,14 @@ export default function CreateRoleForm({
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <form className="space-y-4">
+                        <form className="space-y-4" onSubmit={handleSubmit}>
                             <div className="space-y-2">
-                                <Label htmlFor="name">Role Name</Label>
+                                <Label htmlFor="role">Role Name</Label>
                                 <Input
-                                    id="name"
+                                    id="role"
+                                    value={role}
+                                    onChange={(e) => setRole(e.target.value)}
+                                    required
                                     placeholder="Enter role name..."
                                 />
                             </div>
@@ -107,6 +138,8 @@ export default function CreateRoleForm({
                                         label: permission.name,
                                     }))}
                                     styles={customStyles}
+                                    value={selectedPermissions}
+                                    onChange={(selected) => setSelectedPermissions(selected as { value: string; label: string }[])}
                                     className="focus:ring-2 focus:ring-blue-500"
                                     placeholder="Select permissions..."
                                 />

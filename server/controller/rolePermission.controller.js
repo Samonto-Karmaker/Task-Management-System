@@ -22,9 +22,9 @@ export const getRolePermissionsController = async (req, res) => {
 };
 
 export const createCustomRolesController = async (req, res) => {
-    const { name, permissions } = req.body;
+    const { name, permissionIds } = req.body;
     try {
-        const newRole = await createCustomRoles(name, permissions);
+        const newRole = await createCustomRoles(name, permissionIds);
         res.status(201).json(new ApiResponse(201, "Role created", newRole));
     } catch (error) {
         finalResErrorHandler(error, res);
