@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import apiClient from "@/lib/apiClient";
 import { ApiResponse } from "@/types/api-response";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 interface UserBaseInfo {
@@ -64,7 +65,9 @@ export default function UserPage() {
     return (
         <main className="container mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-8">User Page</h1>
-            <Button>Create User</Button>
+            <Link href="/create-user">
+                <Button>Create User</Button>
+            </Link>
             <hr className="my-8" />
             <div className="overflow-x-auto">
                 <Table className="min-w-full border border-gray-200 rounded-md">
