@@ -64,7 +64,7 @@ export const login = async ({ email, password }) => {
         }
 
         const permissions = await getRolePermissions(user.roleId);
-        const userWithPermissions = { ...user, permissions };
+        const userWithPermissions = { ...user, permissionInfo: permissions };
 
         return userWithPermissions;
     } catch (error) {

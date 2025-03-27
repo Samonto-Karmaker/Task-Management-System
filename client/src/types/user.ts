@@ -1,3 +1,5 @@
+import { permissions } from './permissions';
+
 export type User = {
     id: string;
     email: string;
@@ -6,4 +8,8 @@ export type User = {
     isBlocked: boolean;
     createdAt: string;
     updatedAt: string;
+    permissionInfo: {
+        role: string;
+        permissions: permissions[];
+    }
 }
