@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
     Select,
@@ -11,7 +13,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { FormEvent, useEffect, useState } from "react";
 import apiClient from "@/lib/apiClient";
 import { ApiResponse } from "@/types/api-response";
 
@@ -20,41 +21,44 @@ interface Role {
     name: string;
 }
 
+interface FormData {
+    name: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+    roleId: string;
+}
+
 export default function CreateUserForm() {
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
     const [roles, setRoles] = useState<Role[]>([]);
-    const [selectedRole, setSelectedRole] = useState<string | null>(null);
+
+    const {
+        register,
+        handleSubmit,
+        watch,
+        setValue,
+        formState: { errors },
+    } = useForm<FormData>();
 
     useEffect(() => {
         const fetchRoles = async () => {
             try {
-                const response: ApiResponse = await apiClient.get("/role-permission/roles")
+                const response: ApiResponse = await apiClient.get(
+                    "/role-permission/roles"
+                );
                 if (response.success) {
                     setRoles(response.data);
-                } else {
-                    console.error(response.message);
                 }
             } catch (error) {
-                console.error(error);
+                console.error("Error fetching roles:", error);
             }
-        }
+        };
 
         fetchRoles();
     }, []);
 
-    const getRoleId = (roleName: string | null) => {
-        if (!roleName) return null;
-        const role = roles.find((role) => role.name === roleName);
-        return role ? role.id : null;
-    }
-
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        console.log(`Selected Role: ${selectedRole}`);
-        console.log(`Role ID: ${getRoleId(selectedRole)}`);
+    const onSubmit = async (data: FormData) => {
+        console.log("Form Data:", data);
     };
 
     return (
@@ -69,83 +73,93 @@ export default function CreateUserForm() {
                     </Button>
                 </CardHeader>
                 <CardContent>
-                    <form className="space-y-4" onSubmit={handleSubmit}>
+                    <form
+                        className="space-y-4"
+                        onSubmit={handleSubmit(onSubmit)}
+                    >
+                        {/* Role Selection */}
                         <div className="space-y-2">
                             <Label>Select Role</Label>
-                            <Select onValueChange={(id) => setSelectedRole(id)}>
+                            <Select
+                                onValueChange={(value) =>
+                                    setValue("roleId", value)
+                                }
+                            >
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Select a role" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {roles.map((role) => (
-                                        <SelectItem key={role.id} value={role.name}>
+                                        <SelectItem
+                                            key={role.id}
+                                            value={String(role.id)}
+                                        >
                                             {role.name}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
                         </div>
+
+                        {/* Name */}
                         <div className="space-y-2">
-                            <Label htmlFor="name">Email</Label>
+                            <Label htmlFor="name">Name</Label>
                             <Input
-                                type="text"
                                 id="name"
-                                name="name"
                                 placeholder="John Doe"
-                                required
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                className="w-full border border-gray-300 rounded px-2 py-1"
-                                aria-label="Name"
+                                {...register("name", { required: true })}
                             />
                         </div>
+
+                        {/* Email */}
                         <div className="space-y-2">
                             <Label htmlFor="email">Email</Label>
                             <Input
                                 type="email"
                                 id="email"
-                                name="email"
                                 placeholder="mail@site.com"
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="w-full border border-gray-300 rounded px-2 py-1"
-                                aria-label="Email"
+                                {...register("email", { required: true })}
                             />
                         </div>
+
+                        {/* Password */}
                         <div className="space-y-2">
                             <Label htmlFor="password">Password</Label>
                             <Input
                                 type="password"
                                 id="password"
-                                name="password"
                                 placeholder="********"
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full border border-gray-300 rounded px-2 py-1"
-                                aria-label="Password"
+                                {...register("password", { required: true })}
                             />
                         </div>
+
+                        {/* Confirm Password */}
                         <div className="space-y-2">
-                            <Label htmlFor="confirm_password">Confirm Password</Label>
+                            <Label htmlFor="confirmPassword">
+                                Confirm Password
+                            </Label>
                             <Input
                                 type="password"
-                                id="confirm_password"
-                                name="confirm_password"
+                                id="confirmPassword"
                                 placeholder="********"
-                                required
-                                value={confirmPassword}
-                                onChange={(e) =>
-                                    setConfirmPassword(e.target.value)
-                                }
-                                className="w-full border border-gray-300 rounded px-2 py-1"
-                                aria-label="Confirm Password"
+                                {...register("confirmPassword", {
+                                    required: true,
+                                    validate: (value) =>
+                                        value === watch("password") ||
+                                        "Passwords do not match",
+                                })}
                             />
+                            {errors.confirmPassword && (
+                                <p className="text-sm text-red-500">
+                                    {errors.confirmPassword.message}
+                                </p>
+                            )}
                         </div>
+
+                        {/* Submit Button */}
                         <Button
                             type="submit"
-                            className="bg-blue-500 text-white rounded px-4 py-2"
+                            className="w-full bg-blue-500 text-white rounded px-4 py-2"
                         >
                             Create User
                         </Button>
