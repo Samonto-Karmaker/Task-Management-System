@@ -5,14 +5,18 @@ import { House } from "lucide-react";
 import Link from "next/link";
 import { useUser } from "./hooks/useUser";
 import apiClient from "@/lib/apiClient";
+import { useRouter } from "next/navigation";
+
 
 export default function Header() {
     const { user, setUser } = useUser();
+    const router = useRouter();
 
     const handleLogout = async () => {
         try {
             await apiClient.delete("/logout");
             setUser(null);
+            router.push("/login");
         } catch (error) {
             console.error(error);
             alert("Failed to logout");
