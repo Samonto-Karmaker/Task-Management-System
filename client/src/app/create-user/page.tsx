@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@/components/custom/hooks/useUser";
 import { checkPermission } from "@/utils/checkPermission";
 import Unauthorized from "@/components/custom/Unauthorized";
+import CreateRoleForm from "@/components/custom/CreateRoleForm";
 
 interface Role {
     id: number;
@@ -36,6 +37,7 @@ interface FormData {
 export default function CreateUserForm() {
     const {user} = useUser();
     const [roles, setRoles] = useState<Role[]>([]);
+    const [isOpen, setIsOpen] = useState(false);
 
     const {
         register,
@@ -128,7 +130,7 @@ export default function CreateUserForm() {
                     <CardTitle className="text-2xl font-bold text-center">
                         Create User
                     </CardTitle>
-                    <Button variant="outline" className="w-full my-4">
+                    <Button variant="outline" className="w-full my-4" onClick={() => setIsOpen(true)}>
                         + Create New Role
                     </Button>
                 </CardHeader>
@@ -246,6 +248,7 @@ export default function CreateUserForm() {
                     </form>
                 </CardContent>
             </Card>
+            <CreateRoleForm isOpen={isOpen} setIsOpen={setIsOpen} />
         </div>
     );
 }
