@@ -115,6 +115,33 @@ export const getAllTasks = async () => {
         throw new ApiError(500, "Failed to fetch tasks");
     }
 };
-export const getTasksByAssigner = async (userId) => {};
+export const getTasksByAssigner = async (userId) => {
+    if (!userId) {
+        throw new ApiError(400, "User ID is required");
+    }
+    try {
+        const tasks = await prisma.task.findMany({
+            where: {assignerId: userId},
+            select: {
+                id: true,
+                title: true,
+                priority: true,
+                deadline: true,
+                status: true,
+                assignee: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
+            }
+        })
+
+        return tasks;
+    } catch (error) {
+        console.error(error);
+        throw new ApiError(500, "Failed to fetch tasks by assigner ID");
+    }
+};
 export const getTasksByAssignee = async (userId) => {};
 export const updateTaskStatus = async (id, status) => {};

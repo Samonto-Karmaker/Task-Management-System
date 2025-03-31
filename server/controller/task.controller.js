@@ -1,4 +1,4 @@
-import { createTask, getAllTasks, getTaskById } from "../service/task.service.js";
+import { createTask, getAllTasks, getTaskById, getTasksByAssigner } from "../service/task.service.js";
 import ApiResponse from "../util/ApiResponse.js";
 import { finalResErrorHandler } from "../util/finalResErrorHandler.js";
 
@@ -39,3 +39,13 @@ export const getTaskByIdController = async (req, res) => {
         finalResErrorHandler(error, res);
     }
 }
+
+export const getTaskByAssignerController = async (req, res) => {
+    const userId = req.user.id;
+    try {
+        const tasks = await getTasksByAssigner(userId);
+        res.status(200).json(new ApiResponse(200, "Task fetched successfully", tasks));
+    } catch (error) {
+        finalResErrorHandler(error, res);
+    }
+};
