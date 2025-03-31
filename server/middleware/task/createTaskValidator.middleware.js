@@ -3,6 +3,7 @@ import ApiError from "../../util/ApiError.js";
 import { prisma } from "../../db/setupDB.js";
 import ApiResponse from "../../util/ApiResponse.js";
 import { Priority } from "@prisma/client";
+import { UserPermissions } from "../../util/constant.js";
 
 export const createTaskValidator = [
     check("name")
@@ -29,12 +30,27 @@ export const createTaskValidator = [
         .isUUID()
         .withMessage("Assignee ID must be a valid UUID")
         .custom(async (value) => {
-            const user = await prisma.user.findUnique({ where: { id: value } });
-            if (!user) {
+            const assignee = await prisma.user.findUnique({
+                where: { id: value},
+                include: {
+                    role: {
+                        include: {
+                            permissions: true,
+                        },
+                    }
+                }
+            })
+            if (!assignee) {
                 throw new ApiError(404, "Assignee not found");
             }
+            const hasPermission = assignee.role?.permissions?.some(
+                (permission) => permission.name === UserPermissions.UPDATE_TASK_STATUS
+            )
+            if (!hasPermission) {
+                throw new ApiError(403, "Assignee does not have permission to be assigned tasks");
+            }
             return true;
-        }),
+        })
 ];
 
 export const createTaskValidatorMiddleware = (req, res, next) => {
