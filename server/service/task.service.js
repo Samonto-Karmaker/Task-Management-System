@@ -30,7 +30,59 @@ export const createTask = async ({
         throw new ApiError(500, "Failed to create task");
     }
 };
-export const getTaskById = async (id) => {};
+export const getTaskById = async (id) => {
+    if (!id) {
+        throw new ApiError(400, "Task ID is required");
+    }
+    try {
+        const task = await prisma.task.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                title: true,
+                description: true,
+                priority: true,
+                deadline: true,
+                status: true,
+                updatedAt: true,
+                createdAt: true,
+                assigner: {
+                    select: {
+                        id: true,
+                        name: true,
+                        role: {
+                            select: {
+                                id: true,
+                                name: true,
+                            },
+                        }
+                    },
+                },
+                assignee: {
+                    select: {
+                        id: true,
+                        name: true,
+                        role: {
+                            select: {
+                                id: true,
+                                name: true,
+                            },
+                        }
+                    },
+                },
+            }
+        })
+
+        if (!task) {
+            throw new ApiError(404, "Task not found");
+        }
+
+        return task;
+    } catch (error) {
+        console.error(error);
+        throw new ApiError(500, "Failed to fetch task by ID");
+    }
+};
 export const updateTaskDetails = async (id, task) => {};
 export const deleteTask = async (id) => {};
 export const getAllTasks = async () => {

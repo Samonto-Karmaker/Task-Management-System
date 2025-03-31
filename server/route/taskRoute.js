@@ -8,7 +8,11 @@ import {
     createTaskValidator,
     createTaskValidatorMiddleware,
 } from "../middleware/task/createTaskValidator.middleware.js";
-import { createTaskController, getAllTasksController } from "../controller/task.controller.js";
+import {
+    createTaskController,
+    getAllTasksController,
+    getTaskByIdController,
+} from "../controller/task.controller.js";
 
 const taskRouter = Router();
 
@@ -26,6 +30,13 @@ taskRouter.get(
     checkAuth,
     checkRole(UserPermissions.VIEW_TASKS),
     getAllTasksController
-)
+);
+
+taskRouter.get(
+    "/:id",
+    checkAuth,
+    checkRole(UserPermissions.VIEW_TASK),
+    getTaskByIdController
+);
 
 export default taskRouter;
