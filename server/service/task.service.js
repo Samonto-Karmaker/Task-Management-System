@@ -80,6 +80,9 @@ export const getTaskById = async (id) => {
         return task;
     } catch (error) {
         console.error(error);
+        if (error instanceof ApiError) {
+            throw error;
+        }
         throw new ApiError(500, "Failed to fetch task by ID");
     }
 };
