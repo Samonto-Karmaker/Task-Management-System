@@ -1,5 +1,6 @@
 import { prisma } from "../db/setupDB.js";
 import ApiError from "../util/ApiError.js";
+import { TaskStatus } from "@prisma/client";
 
 export const createTask = async ({
     name,
@@ -9,7 +10,14 @@ export const createTask = async ({
     assignerId,
     assigneeId,
 }) => {
-    if (!name || !description || !priority || !deadline || !assignerId || !assigneeId) {
+    if (
+        !name ||
+        !description ||
+        !priority ||
+        !deadline ||
+        !assignerId ||
+        !assigneeId
+    ) {
         throw new ApiError(400, "Missing required fields");
     }
     try {
@@ -21,8 +29,8 @@ export const createTask = async ({
                 deadline,
                 assignerId,
                 assigneeId,
-            }
-        })
+            },
+        });
 
         return newTask;
     } catch (error) {
@@ -56,7 +64,7 @@ export const getTaskById = async (id) => {
                                 id: true,
                                 name: true,
                             },
-                        }
+                        },
                     },
                 },
                 assignee: {
@@ -69,11 +77,11 @@ export const getTaskById = async (id) => {
                                 id: true,
                                 name: true,
                             },
-                        }
+                        },
                     },
                 },
-            }
-        })
+            },
+        });
 
         if (!task) {
             throw new ApiError(404, "Task not found");
@@ -111,8 +119,8 @@ export const getAllTasks = async () => {
                         name: true,
                     },
                 },
-            }
-        })
+            },
+        });
 
         return tasks;
     } catch (error) {
@@ -126,7 +134,7 @@ export const getTasksByAssigner = async (userId) => {
     }
     try {
         const tasks = await prisma.task.findMany({
-            where: {assignerId: userId},
+            where: { assignerId: userId },
             select: {
                 id: true,
                 title: true,
@@ -139,8 +147,8 @@ export const getTasksByAssigner = async (userId) => {
                         name: true,
                     },
                 },
-            }
-        })
+            },
+        });
 
         return tasks;
     } catch (error) {
@@ -155,7 +163,7 @@ export const getTasksByAssignee = async (userId) => {
 
     try {
         const tasks = await prisma.task.findMany({
-            where: {assigneeId: userId},
+            where: { assigneeId: userId },
             select: {
                 id: true,
                 title: true,
@@ -168,8 +176,8 @@ export const getTasksByAssignee = async (userId) => {
                         name: true,
                     },
                 },
-            }
-        })
+            },
+        });
 
         return tasks;
     } catch (error) {
@@ -177,4 +185,77 @@ export const getTasksByAssignee = async (userId) => {
         throw new ApiError(500, "Failed to fetch tasks by assignee ID");
     }
 };
-export const updateTaskStatus = async (id, status) => {};
+export const updateTaskStatus = async (taskId, userId, status) => {
+    if (!taskId || !userId || !status) {
+        throw new ApiError(400, "Task ID, User ID, and status are required");
+    }
+    if (!Object.values(TaskStatus).includes(status)) {
+        throw new ApiError(400, "Invalid task status");
+    }
+    try {
+        const task = await prisma.task.findUnique({
+            where: { id: taskId },
+            select: {
+                id: true,
+                status: true,
+                assignerId: true,
+                assigneeId: true,
+            },
+        });
+
+        if (!task) {
+            throw new ApiError(404, "Task not found");
+        }
+
+        isValidTaskStatusTransition(task.status, status);
+        isUpdaterAuthorized(task, userId);
+
+        const updatedTask = await prisma.task.update({
+            where: { id: taskId },
+            data: {
+                status: status,
+            },
+            select: {
+                id: true,
+                status: true,
+            },
+        });
+
+        return updatedTask;
+    } catch (error) {
+        console.error(error);
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        throw new ApiError(500, "Failed to update task status");
+    }
+};
+
+// Helper functions
+const isValidTaskStatusTransition = (currentStatus, newStatus) => {
+    if (currentStatus === newStatus) {
+        throw new ApiError(400, "Task is already in the requested status");
+    }
+    if (newStatus === TaskStatus.COMPLETED) {
+        throw new ApiError(400, "Cannot update a completed task");
+    }
+    if (
+        currentStatus === TaskStatus.IN_PROGRESS &&
+        newStatus === TaskStatus.PENDING
+    ) {
+        throw new ApiError(
+            400,
+            "Cannot move task back to pending from in progress"
+        );
+    }
+};
+const isUpdaterAuthorized = (task, userId) => {
+    const isAssigner = task.assignerId === userId;
+    const isAssignee = task.assigneeId === userId;
+    if (!isAssigner && !isAssignee) {
+        throw new ApiError(
+            403,
+            "You do not have permission to update this task"
+        );
+    }
+};
