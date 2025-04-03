@@ -11,6 +11,7 @@ import {
 import {
     createTaskController,
     getAllTasksController,
+    getAssignableUsersController,
     getTaskByAssigneeController,
     getTaskByAssignerController,
     getTaskByIdController,
@@ -50,6 +51,13 @@ taskRouter.get(
 );
 
 taskRouter.get(
+    "/assignable-users",
+    checkAuth,
+    checkRole(UserPermissions.ASSIGN_TASK),
+    getAssignableUsersController
+);
+
+taskRouter.get(
     "/:id",
     checkAuth,
     checkRole(UserPermissions.VIEW_TASK),
@@ -61,6 +69,6 @@ taskRouter.patch(
     checkAuth,
     checkRole(UserPermissions.UPDATE_TASK_STATUS),
     updateTaskStatusController
-)
+);
 
 export default taskRouter;

@@ -1,6 +1,7 @@
 import {
     createTask,
     getAllTasks,
+    getAssignableUsers,
     getTaskById,
     getTasksByAssignee,
     getTasksByAssigner,
@@ -83,7 +84,22 @@ export const updateTaskStatusController = async (req, res) => {
     try {
         const updatedTask = await updateTaskStatus(id, userId, status);
         res.status(200).json(
-            new ApiResponse(200, "Task status updated successfully", updatedTask)
+            new ApiResponse(
+                200,
+                "Task status updated successfully",
+                updatedTask
+            )
+        );
+    } catch (error) {
+        finalResErrorHandler(error, res);
+    }
+};
+
+export const getAssignableUsersController = async (req, res) => {
+    try {
+        const users = await getAssignableUsers();
+        res.status(200).json(
+            new ApiResponse(200, "Assignable users fetched successfully", users)
         );
     } catch (error) {
         finalResErrorHandler(error, res);

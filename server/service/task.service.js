@@ -1,6 +1,8 @@
 import { prisma } from "../db/setupDB.js";
 import ApiError from "../util/ApiError.js";
 import { TaskStatus } from "@prisma/client";
+import { getUsersWithPermission } from "./user.service.js";
+import { UserPermissions } from "../util/constant.js";
 
 export const createTask = async ({
     name,
@@ -231,6 +233,33 @@ export const updateTaskStatus = async (taskId, userId, status) => {
             throw error;
         }
         throw new ApiError(500, "Failed to update task status");
+    }
+};
+export const getAssignableUsers = async () => {
+    try {
+        const users = await getUsersWithPermission(
+            UserPermissions.UPDATE_TASK_STATUS
+        );
+        if (!users) {
+            throw new ApiError(
+                404,
+                "No users found with the specified permission"
+            );
+        }
+        return users.map((user) => {
+            return {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role.name,
+            };
+        });
+    } catch (error) {
+        console.error(error);
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        throw new ApiError(500, "Failed to fetch assignable users");
     }
 };
 
