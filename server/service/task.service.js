@@ -220,6 +220,9 @@ export const updateTaskStatus = async (taskId, userId, status) => {
                 status: true,
             },
         });
+        if (!updatedTask) {
+            throw new ApiError(404, "Task not found");
+        }
 
         return updatedTask;
     } catch (error) {
@@ -236,7 +239,7 @@ const isValidTaskStatusTransition = (currentStatus, newStatus) => {
     if (currentStatus === newStatus) {
         throw new ApiError(400, "Task is already in the requested status");
     }
-    if (newStatus === TaskStatus.COMPLETED) {
+    if (currentStatus === TaskStatus.COMPLETED) {
         throw new ApiError(400, "Cannot update a completed task");
     }
     if (

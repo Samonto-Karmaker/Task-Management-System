@@ -4,6 +4,7 @@ import {
     getTaskById,
     getTasksByAssignee,
     getTasksByAssigner,
+    updateTaskStatus,
 } from "../service/task.service.js";
 import ApiResponse from "../util/ApiResponse.js";
 import { finalResErrorHandler } from "../util/finalResErrorHandler.js";
@@ -68,6 +69,21 @@ export const getTaskByAssigneeController = async (req, res) => {
         const tasks = await getTasksByAssignee(userId);
         res.status(200).json(
             new ApiResponse(200, "Task fetched successfully", tasks)
+        );
+    } catch (error) {
+        finalResErrorHandler(error, res);
+    }
+};
+
+export const updateTaskStatusController = async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+    const userId = req.user.id;
+
+    try {
+        const updatedTask = await updateTaskStatus(id, userId, status);
+        res.status(200).json(
+            new ApiResponse(200, "Task status updated successfully", updatedTask)
         );
     } catch (error) {
         finalResErrorHandler(error, res);
