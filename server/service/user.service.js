@@ -2,6 +2,7 @@ import ApiError from "../util/ApiError.js";
 import { prisma } from "../db/setupDB.js";
 import bcrypt from "bcrypt";
 import { getRolePermissions } from "./rolePermission.service.js";
+import { UserPermissions } from "../util/constant.js";
 
 export const createUser = async ({ name, email, password, roleId }) => {
     if (!name || !email || !password || !roleId) {
@@ -73,5 +74,43 @@ export const login = async ({ email, password }) => {
             throw error;
         }
         throw new ApiError(500, "Internal Server Error");
+    }
+};
+
+export const getUsersWithPermission = async (permissionName) => {
+    if (!permissionName) {
+        throw new ApiError(400, "Permission name is required");
+    }
+    if (!Object.values(UserPermissions).includes(permissionName)) {
+        throw new ApiError(400, "Invalid permission name");
+    }
+    try {
+        const users = await prisma.user.findMany({
+            where: {
+                role: {
+                    permissions: {
+                        some: {
+                            name: permissionName,
+                        },
+                    },
+                },
+            },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
+            },
+        });
+
+        return users;
+    } catch (error) {
+        console.error(error);
+        throw new ApiError(500, "Failed to fetch users with the specified permission");
     }
 };
