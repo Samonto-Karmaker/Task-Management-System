@@ -11,6 +11,7 @@ import {
 import {
     createTaskController,
     getAllTasksController,
+    getTaskByAssigneeController,
     getTaskByAssignerController,
     getTaskByIdController,
 } from "../controller/task.controller.js";
@@ -36,8 +37,15 @@ taskRouter.get(
 taskRouter.get(
     "/assigner",
     checkAuth,
-    checkRole(UserPermissions.VIEW_ASSIGNED_TASK),
+    checkRole(UserPermissions.VIEW_TASK_ASSIGNEES),
     getTaskByAssignerController
+);
+
+taskRouter.get(
+    "/assignee",
+    checkAuth,
+    checkRole(UserPermissions.VIEW_ASSIGNED_TASK),
+    getTaskByAssigneeController
 );
 
 taskRouter.get(
