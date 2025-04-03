@@ -50,6 +50,7 @@ export const getTaskById = async (id) => {
                     select: {
                         id: true,
                         name: true,
+                        email: true,
                         role: {
                             select: {
                                 id: true,
@@ -62,6 +63,7 @@ export const getTaskById = async (id) => {
                     select: {
                         id: true,
                         name: true,
+                        email: true,
                         role: {
                             select: {
                                 id: true,
