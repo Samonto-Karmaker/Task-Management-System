@@ -1,5 +1,5 @@
 type FetchOptions = {
-    method: "GET" | "POST" | "PUT" | "DELETE";
+    method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
     body?: any;
     headers?: Record<string, string>;
 };
@@ -39,6 +39,10 @@ class ApiClient {
 
     public async put<T>(url: string, body: any, headers?: Record<string, string>): Promise<T> {
         return this.sendRequest<T>(url, { method: "PUT", body, headers });
+    }
+
+    public async patch<T>(url: string, body: any, headers?: Record<string, string>): Promise<T> {
+        return this.sendRequest<T>(url, { method: "PATCH", body, headers });
     }
 
     public async delete<T>(url: string, headers?: Record<string, string>): Promise<T> {
