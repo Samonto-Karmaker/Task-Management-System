@@ -98,7 +98,76 @@ export const getTaskById = async (id) => {
         throw new ApiError(500, "Failed to fetch task by ID");
     }
 };
-export const updateTaskDetails = async (id, task) => {};
+export const updateTaskDetails = async (taskId, userId, updatedTask) => {
+    if (
+        !taskId ||
+        !userId ||
+        !updatedTask ||
+        Object.keys(updatedTask).length === 0
+    ) {
+        throw new ApiError(
+            400,
+            "Task ID, User ID, and updated task are required"
+        );
+    }
+    try {
+        const task = await prisma.task.findUnique({
+            where: { id: taskId },
+            select: {
+                id: true,
+                assignerId: true,
+            },
+        });
+        if (!task) {
+            throw new ApiError(404, "Task not found");
+        }
+
+        const isAssigner = task.assignerId === userId;
+        if (!isAssigner) {
+            throw new ApiError(
+                403,
+                "You do not have permission to update this task"
+            );
+        }
+
+        const updatedTaskDetails = await prisma.task.update({
+            where: { id: taskId },
+            data: updatedTask,
+            select: {
+                id: true,
+                title: true,
+                description: true,
+                priority: true,
+                deadline: true,
+                updatedAt: true,
+                assigner: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
+                assignee: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
+            },
+        });
+
+        if (!updatedTaskDetails) {
+            throw new ApiError(404, "Task not found");
+        }
+
+        return updatedTaskDetails;
+    } catch (error) {
+        console.error(error);
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        throw new ApiError(500, "Failed to update task details");
+    }
+};
 export const deleteTask = async (id) => {};
 export const getAllTasks = async () => {
     try {
