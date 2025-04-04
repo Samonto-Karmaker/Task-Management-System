@@ -80,34 +80,15 @@ export default function CreateUserForm() {
 
             if (response.success) {
                 console.log("User created successfully");
-                setValue("name", "");
-                setValue("email", "");
-                setValue("password", "");
-                setValue("confirmPassword", "");
-                setValue("roleId", "");
-
-                setError("name", { message: "" });
-                setError("email", { message: "" });
-                setError("password", { message: "" });
-                setError("confirmPassword", { message: "" });
-                setError("roleId", { message: "" });
-
                 alert("User created successfully");
 
                 router.push("/users");
             } else if (response.statusCode === 400 && response.data) {
                 const errors = response.data;
-                if (errors.name) {
-                    setError("name", { message: errors.name.msg });
-                }
-                if (errors.email) {
-                    setError("email", { message: errors.email.msg });
-                }
-                if (errors.password) {
-                    setError("password", { message: errors.password.msg });
-                }
-                if (errors.roleId) {
-                    setError("roleId", { message: errors.roleId.msg });
+                for (const key in errors) {
+                    setError(key as keyof FormData, {
+                        message: errors[key].msg,
+                    });
                 }
             } else {
                 console.error("Error creating user:", response.message);
