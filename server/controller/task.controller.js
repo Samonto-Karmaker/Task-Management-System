@@ -5,6 +5,7 @@ import {
     getTaskById,
     getTasksByAssignee,
     getTasksByAssigner,
+    updateTaskDetails,
     updateTaskStatus,
 } from "../service/task.service.js";
 import ApiResponse from "../util/ApiResponse.js";
@@ -100,6 +101,20 @@ export const getAssignableUsersController = async (req, res) => {
         const users = await getAssignableUsers();
         res.status(200).json(
             new ApiResponse(200, "Assignable users fetched successfully", users)
+        );
+    } catch (error) {
+        finalResErrorHandler(error, res);
+    }
+};
+
+export const updateTaskDetailsController = async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.id;
+    const { taskDetails } = req.body;
+    try {
+        const updatedTask = await updateTaskDetails(id, userId, taskDetails);
+        res.status(200).json(
+            new ApiResponse(200, "Task updated successfully", updatedTask)
         );
     } catch (error) {
         finalResErrorHandler(error, res);

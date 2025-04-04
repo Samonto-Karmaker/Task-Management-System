@@ -15,6 +15,7 @@ import {
     getTaskByAssigneeController,
     getTaskByAssignerController,
     getTaskByIdController,
+    updateTaskDetailsController,
     updateTaskStatusController,
 } from "../controller/task.controller.js";
 
@@ -69,6 +70,15 @@ taskRouter.patch(
     checkAuth,
     checkRole(UserPermissions.UPDATE_TASK_STATUS),
     updateTaskStatusController
+);
+
+taskRouter.patch(
+    "/update/:id",
+    checkAuth,
+    checkRole(UserPermissions.UPDATE_TASK),
+    taskValidator(true),
+    taskValidatorMiddleware,
+    updateTaskDetailsController
 );
 
 export default taskRouter;
