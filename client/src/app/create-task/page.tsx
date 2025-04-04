@@ -12,10 +12,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Priority } from "@/utils/constant";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ApiResponse } from "@/types/api-response";
 import apiClient from "@/lib/apiClient";
-import { useRef } from "react";
+import { useUser } from "@/components/custom/hooks/useUser";
+import { checkPermission } from "@/utils/checkPermission";
+import Unauthorized from "@/components/custom/Unauthorized";
 
 interface AssignAbleUser {
     id: string;
@@ -25,8 +27,15 @@ interface AssignAbleUser {
 }
 
 export default function CreateTaskForm() {
-    const [assignableUsers, setAssignableUsers] = useState<AssignAbleUser[]>([]);
+    const [assignableUsers, setAssignableUsers] = useState<AssignAbleUser[]>(
+        []
+    );
     const hasAssignableUsersFetched = useRef(false);
+
+    const { user } = useUser();
+    const isAuthorized =
+        checkPermission(user, "CREATE_TASK") &&
+        checkPermission(user, "ASSIGN_TASK");
 
     useEffect(() => {
         const fetchAssignAbleUsers = async () => {
@@ -47,8 +56,14 @@ export default function CreateTaskForm() {
             }
         };
 
-        fetchAssignAbleUsers();
-    }, []);
+        if (isAuthorized) {
+            fetchAssignAbleUsers();
+        }
+    }, [isAuthorized]);
+
+    if (!isAuthorized) {
+        return <Unauthorized />;
+    }
 
     return (
         <div className="max-w-md mx-auto">
@@ -60,7 +75,7 @@ export default function CreateTaskForm() {
                 </CardHeader>
                 <CardContent>
                     <form className="space-y-4">
-                    <div className="space-y-2">
+                        <div className="space-y-2">
                             <Label>Select Assignee</Label>
                             <Select>
                                 <SelectTrigger className="w-full">
@@ -68,8 +83,12 @@ export default function CreateTaskForm() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     {assignableUsers.map((user) => (
-                                        <SelectItem key={user.id} value={String(user.id)}>
-                                            {user.name} - {user.email} - {user.role}
+                                        <SelectItem
+                                            key={user.id}
+                                            value={String(user.id)}
+                                        >
+                                            {user.name} - {user.email} -{" "}
+                                            {user.role}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
