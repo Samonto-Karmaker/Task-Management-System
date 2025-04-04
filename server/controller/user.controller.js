@@ -1,5 +1,10 @@
 import ApiResponse from "../util/ApiResponse.js";
-import { createUser, getAllUsers, login } from "../service/user.service.js";
+import {
+    createUser,
+    getAllUsers,
+    login,
+    toggleBlockUser,
+} from "../service/user.service.js";
 import jwt from "jsonwebtoken";
 import ms from "ms";
 import { finalResErrorHandler } from "../util/finalResErrorHandler.js";
@@ -60,4 +65,14 @@ export const getLoggedInUserController = (req, res) => {
         password: undefined,
     };
     res.status(200).json(new ApiResponse(200, "User retrieved", loggedInUser));
+};
+
+export const toggleBlockUserController = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const user = await toggleBlockUser(id);
+        res.status(200).json(new ApiResponse(200, "User blocked/unblocked", user));
+    } catch (error) {
+        finalResErrorHandler(error, res);
+    }
 };

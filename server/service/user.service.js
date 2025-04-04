@@ -38,8 +38,14 @@ export const createUser = async ({ name, email, password, roleId }) => {
 export const getAllUsers = async () => {
     try {
         const users = await prisma.user.findMany({
-            select: { id: true, name: true, email: true, role: true, isBlocked: true },
-        })
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                isBlocked: true,
+            },
+        });
         return users;
     } catch (error) {
         console.error(error);
@@ -114,6 +120,41 @@ export const getUsersWithPermission = async (permissionName) => {
         return users;
     } catch (error) {
         console.error(error);
-        throw new ApiError(500, "Failed to fetch users with the specified permission");
+        throw new ApiError(
+            500,
+            "Failed to fetch users with the specified permission"
+        );
+    }
+};
+
+export const toggleBlockUser = async (userId) => {
+    if (!userId) {
+        throw new ApiError(400, "User ID is required");
+    }
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { isBlocked: true },
+        });
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
+        const updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: { isBlocked: !user.isBlocked },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                isBlocked: true,
+            },
+        });
+        return updatedUser;
+    } catch (error) {
+        console.error(error);
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        throw new ApiError(500, "Internal Server Error");
     }
 };

@@ -9,6 +9,7 @@ import {
     getLoggedInUserController,
     loginController,
     logoutController,
+    toggleBlockUserController,
 } from "../controller/user.controller.js";
 import {
     checkAuth,
@@ -35,5 +36,11 @@ userRouter.get(
 userRouter.post("/login", loginController);
 userRouter.delete("/logout", checkAuth, logoutController);
 userRouter.get("/me", checkAuth, getLoggedInUserController);
+userRouter.patch(
+    "/toggle-block/:id",
+    checkAuth,
+    checkRole(UserPermissions.BLOCK_USER),
+    toggleBlockUserController
+);
 
 export default userRouter;
