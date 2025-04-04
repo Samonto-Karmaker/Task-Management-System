@@ -110,9 +110,8 @@ export const getAssignableUsersController = async (req, res) => {
 export const updateTaskDetailsController = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
-    const { taskDetails } = req.body;
     try {
-        const updatedTask = await updateTaskDetails(id, userId, taskDetails);
+        const updatedTask = await updateTaskDetails(id, userId, req.body);
         res.status(200).json(
             new ApiResponse(200, "Task updated successfully", updatedTask)
         );
