@@ -52,6 +52,9 @@ export default function AllTasksDashboardPage() {
 
     const isAuthorized = checkPermission(user, "VIEW_TASKS");
     const canChangeStatus = checkPermission(user, "UPDATE_TASK_STATUS");
+    const canUpdateTask = checkPermission(user, "UPDATE_TASK");
+    const canDeleteTask = checkPermission(user, "DELETE_TASK");
+    const canCreateTask = checkPermission(user, "CREATE_TASK");
 
     useEffect(() => {
         const fetchAllTasks = async () => {
@@ -139,9 +142,13 @@ export default function AllTasksDashboardPage() {
     return (
         <main className="container mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-8">All Tasks Dashboard</h1>
-            <Link href="/create-task">
-                <Button>Create Task</Button>
-            </Link>
+            {canCreateTask && (
+                <Link href="/create-task">
+                    <Button variant="default" className="mb-4">
+                        Create Task
+                    </Button>
+                </Link>
+            )}
             <hr className="my-8" />
             <div className="overflow-x-auto">
                 <Table className="min-w-full border border-gray-200 rounded-md">
@@ -165,12 +172,20 @@ export default function AllTasksDashboardPage() {
                             <TableHead className="text-left p-3">
                                 Assignee
                             </TableHead>
-                            <TableHead className="text-left p-3">
-                                Edit
-                            </TableHead>
-                            <TableHead className="text-left p-3">
-                                Delete
-                            </TableHead>
+                            {
+                                canUpdateTask && (
+                                    <TableHead className="text-left p-3">
+                                        Update
+                                    </TableHead>
+                                )
+                            }
+                            {
+                                canDeleteTask && (
+                                    <TableHead className="text-left p-3">
+                                        Delete
+                                    </TableHead>
+                                )
+                            }
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -247,26 +262,31 @@ export default function AllTasksDashboardPage() {
                                 <TableCell className="p-3">
                                     {task.assignee.name}
                                 </TableCell>
-                                <TableCell className="p-3">
-                                    <Button
-                                        variant="default"
-                                        className="cursor-pointer"
-                                        onClick={() => handleUpdateTask(task)}
-                                    >
-                                        <FilePenLine />
-                                    </Button>
-                                </TableCell>
-                                <TableCell className="p-3">
-                                    <Button
-                                        variant="destructive"
-                                        className="cursor-pointer"
-                                        onClick={() =>
-                                            handleDeleteTask(task.id)
-                                        }
-                                    >
-                                        <Trash2 />
-                                    </Button>
-                                </TableCell>
+                                {canUpdateTask && (
+                                    <TableCell className="p-3">
+                                        <Button
+                                            variant="ghost"
+                                            onClick={() =>
+                                                handleUpdateTask(task)
+                                            }
+                                        >
+                                            <FilePenLine size={20} />
+                                        </Button>
+                                    </TableCell>
+                                )}
+                                {canDeleteTask && (
+                                    <TableCell className="p-3">
+                                        <Button
+                                            variant="ghost"
+                                            className="text-red-500"
+                                            onClick={() =>
+                                                handleDeleteTask(task.id)
+                                            }
+                                        >
+                                            <Trash2 size={20} />
+                                        </Button>
+                                    </TableCell>
+                                )}
                             </TableRow>
                         ))}
                     </TableBody>
