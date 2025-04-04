@@ -54,18 +54,31 @@ export default function UserPage() {
         }
     }, [user]);
 
-    const toggleBlock = (userId: string) => {
-        setUsers(() => {
-            return users.map((user) => {
-                if (user.id === userId) {
-                    return {
-                        ...user,
-                        isBlocked: !user.isBlocked,
-                    };
-                }
-                return user;
-            });
-        });
+    const toggleBlock = async (userId: string) => {
+        try {
+            const response: ApiResponse = await apiClient.patch(`/toggle-block/${userId}`, {});
+            if (response.success) {
+                const updatedUser = response.data;
+                setUsers(() => {
+                    return users.map((user) => {
+                        if (user.id === userId) {
+                            return {
+                                ...user,
+                                isBlocked: updatedUser.isBlocked,
+                            };
+                        }
+                        return user;
+                    });
+                });
+                alert(`User ${userId} has been ${response.data.isBlocked ? "blocked" : "unblocked"}`);
+            } else {
+                console.error(response.message);
+                alert(`Failed to toggle block status: ${response.message}`);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("An error occurred. Please try again later.");
+        }
     };
 
     if (!checkPermission(user, "USER")) {
