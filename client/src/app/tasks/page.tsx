@@ -26,10 +26,12 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { TaskStatus } from "@/utils/constant";
+import { useRouter } from "next/navigation";
 
 interface Task {
     id: string;
     title: string;
+    description: string;
     priority: string;
     deadline: string;
     status: string;
@@ -46,6 +48,8 @@ interface Task {
 export default function AllTasksDashboardPage() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const { user } = useUser();
+    const router = useRouter();
+
     const isAuthorized = checkPermission(user, "VIEW_TASKS");
     const canChangeStatus = checkPermission(user, "UPDATE_TASK_STATUS");
 
@@ -116,6 +120,13 @@ export default function AllTasksDashboardPage() {
                 console.error(error);
                 alert("An error occurred. Please try again later.");
             }
+        }
+    };
+
+    const handleUpdateTask = async (task: Task) => {
+        if (confirm("Are you sure you want to update this task?")) {
+            localStorage.setItem("taskToUpdate", JSON.stringify(task));
+            router.push(`/update-task/${task.id}`);
         }
     };
 
@@ -240,6 +251,7 @@ export default function AllTasksDashboardPage() {
                                     <Button
                                         variant="default"
                                         className="cursor-pointer"
+                                        onClick={() => handleUpdateTask(task)}
                                     >
                                         <FilePenLine />
                                     </Button>

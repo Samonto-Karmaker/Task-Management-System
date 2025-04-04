@@ -211,6 +211,7 @@ export const getAllTasks = async () => {
             select: {
                 id: true,
                 title: true,
+                description: true,
                 priority: true,
                 deadline: true,
                 status: true,

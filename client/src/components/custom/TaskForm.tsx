@@ -111,8 +111,9 @@ export default function TaskForm({
             const response: ApiResponse =
                 mode === "create"
                     ? await apiClient.post("/task", payload)
-                    : await apiClient.patch(`/task/${taskId}`, payload);
+                    : await apiClient.patch(`/task/update/${taskId}`, payload);
 
+            console.log(payload, response);
             if (response.success) {
                 alert(
                     `Task ${
@@ -156,7 +157,9 @@ export default function TaskForm({
                             <Select
                                 defaultValue={defaultValues.assigneeId}
                                 onValueChange={(value) =>
-                                    setValue("assigneeId", value)
+                                    setValue("assigneeId", value, {
+                                        shouldDirty: true,
+                                    })
                                 }
                                 required
                             >
@@ -270,7 +273,9 @@ export default function TaskForm({
                                     defaultValues.priority || Priority.LOW
                                 }
                                 onValueChange={(value) =>
-                                    setValue("priority", value as Priority)
+                                    setValue("priority", value as Priority, {
+                                        shouldDirty: true,
+                                    })
                                 }
                                 required
                             >
