@@ -63,6 +63,9 @@ export const login = async ({ email, password }) => {
         if (!passwordMatch) {
             throw new ApiError(401, "Invalid credentials");
         }
+        if (user.isBlocked) {
+            throw new ApiError(403, "User is blocked");
+        }
 
         const permissions = await getRolePermissions(user.roleId);
         const userWithPermissions = { ...user, permissionInfo: permissions };
