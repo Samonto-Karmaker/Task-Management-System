@@ -10,6 +10,7 @@ import {
 } from "../middleware/task/taskValidator.middleware.js";
 import {
     createTaskController,
+    deleteTaskController,
     getAllTasksController,
     getAssignableUsersController,
     getTaskByAssigneeController,
@@ -79,6 +80,13 @@ taskRouter.patch(
     taskValidator(true),
     taskValidatorMiddleware,
     updateTaskDetailsController
+);
+
+taskRouter.delete(
+    "/:id",
+    checkAuth,
+    checkRole(UserPermissions.DELETE_TASK),
+    deleteTaskController
 );
 
 export default taskRouter;

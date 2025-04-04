@@ -1,5 +1,6 @@
 import {
     createTask,
+    deleteTask,
     getAllTasks,
     getAssignableUsers,
     getTaskById,
@@ -119,3 +120,16 @@ export const updateTaskDetailsController = async (req, res) => {
         finalResErrorHandler(error, res);
     }
 };
+
+export const deleteTaskController = async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.id;
+    try {
+        await deleteTask(id, userId);
+        res.status(200).json(
+            new ApiResponse(200, "Task deleted successfully")
+        );
+    } catch (error) {
+        finalResErrorHandler(error, res);
+    }
+}

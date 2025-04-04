@@ -168,7 +168,43 @@ export const updateTaskDetails = async (taskId, userId, updatedTask) => {
         throw new ApiError(500, "Failed to update task details");
     }
 };
-export const deleteTask = async (id) => {};
+export const deleteTask = async (taskId, userId) => {
+    if (!taskId || !userId) {
+        throw new ApiError(400, "Task ID and User ID are required");
+    }
+    try {
+        const task = await prisma.task.findUnique({
+            where: { id: taskId },
+            select: {
+                id: true,
+                assignerId: true,
+            },
+        });
+        if (!task) {
+            throw new ApiError(404, "Task not found");
+        }
+
+        const isAssigner = task.assignerId === userId;
+        if (!isAssigner) {
+            throw new ApiError(
+                403,
+                "You do not have permission to delete this task"
+            );
+        }
+
+        await prisma.task.delete({
+            where: { id: taskId },
+        });
+
+        return { message: "Task deleted successfully" };
+    } catch (error) {
+        console.error(error);
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        throw new ApiError(500, "Failed to delete task");
+    }
+};
 export const getAllTasks = async () => {
     try {
         const tasks = await prisma.task.findMany({
