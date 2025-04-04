@@ -6,7 +6,7 @@ import { Priority } from "@prisma/client";
 import { UserPermissions } from "../../util/constant.js";
 
 export const createTaskValidator = [
-    check("name")
+    check("title")
         .isLength({ min: 3, max: 127 })
         .withMessage("Task name must be at least 3 characters long and less than 127 characters")
         .trim(),

@@ -11,11 +11,11 @@ import ApiResponse from "../util/ApiResponse.js";
 import { finalResErrorHandler } from "../util/finalResErrorHandler.js";
 
 export const createTaskController = async (req, res) => {
-    const { name, description, priority, deadline, assigneeId } = req.body;
+    const { title, description, priority, deadline, assigneeId } = req.body;
     const assignerId = req.user.id;
     try {
         const newTask = await createTask({
-            name,
+            title,
             description,
             priority,
             deadline,

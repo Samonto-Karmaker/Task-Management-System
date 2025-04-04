@@ -5,7 +5,7 @@ import { getUsersWithPermission } from "./user.service.js";
 import { UserPermissions } from "../util/constant.js";
 
 export const createTask = async ({
-    name,
+    title,
     description,
     priority,
     deadline,
@@ -13,7 +13,7 @@ export const createTask = async ({
     assigneeId,
 }) => {
     if (
-        !name ||
+        !title ||
         !description ||
         !priority ||
         !deadline ||
@@ -25,7 +25,7 @@ export const createTask = async ({
     try {
         const newTask = await prisma.task.create({
             data: {
-                title: name,
+                title,
                 description,
                 priority,
                 deadline,
