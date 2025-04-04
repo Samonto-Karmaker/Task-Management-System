@@ -5,9 +5,9 @@ import {
 } from "../middleware/common/authorization.middleware.js";
 import { UserPermissions } from "../util/constant.js";
 import {
-    createTaskValidator,
-    createTaskValidatorMiddleware,
-} from "../middleware/task/createTaskValidator.middleware.js";
+    taskValidator,
+    taskValidatorMiddleware,
+} from "../middleware/task/taskValidator.middleware.js";
 import {
     createTaskController,
     getAllTasksController,
@@ -24,8 +24,8 @@ taskRouter.post(
     "/",
     checkAuth,
     checkRole(UserPermissions.CREATE_TASK),
-    createTaskValidator,
-    createTaskValidatorMiddleware,
+    taskValidator(false),
+    taskValidatorMiddleware,
     createTaskController
 );
 
