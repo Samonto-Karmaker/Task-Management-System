@@ -62,6 +62,27 @@ export default function AllTasksDashboardPage() {
         }
     }, [isAuthorized]);
 
+    const handleDeleteTask = async (taskId: string) => {
+        if (confirm("Are you sure you want to delete this task?")) {
+            try {
+                const response: ApiResponse = await apiClient.delete(
+                    `/task/${taskId}`
+                );
+                if (response.success) {
+                    setTasks((prevTasks) =>
+                        prevTasks.filter((task) => task.id !== taskId)
+                    );
+                } else {
+                    console.error(response.message);
+                    alert(`Failed to delete task: ${response.message}`);
+                }
+            } catch (error) {
+                console.error(error);
+                alert("An error occurred. Please try again later.");
+            }
+        }
+    };
+
     if (!isAuthorized) {
         if (user) {
             return <UserTasksDashboardPage />;
@@ -116,8 +137,12 @@ export default function AllTasksDashboardPage() {
                                 </TableCell>
                                 <TableCell
                                     className={`p-3 ${
-                                        new Date(task.deadline)
-                                            .setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)
+                                        new Date(task.deadline).setHours(
+                                            0,
+                                            0,
+                                            0,
+                                            0
+                                        ) < new Date().setHours(0, 0, 0, 0)
                                             ? "text-red-500 font-bold"
                                             : ""
                                     }`}
@@ -145,6 +170,9 @@ export default function AllTasksDashboardPage() {
                                     <Button
                                         variant="destructive"
                                         className="cursor-pointer"
+                                        onClick={() =>
+                                            handleDeleteTask(task.id)
+                                        }
                                     >
                                         <Trash2 />
                                     </Button>
