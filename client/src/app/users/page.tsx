@@ -31,6 +31,7 @@ interface UserBaseInfo {
 export default function UserPage() {
     const [users, setUsers] = useState<UserBaseInfo[]>([]);
     const { user } = useUser();
+    const canBlock = checkPermission(user, "BLOCK_USER");
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -74,8 +75,8 @@ export default function UserPage() {
                     });
                 });
                 alert(
-                    `User ${userId} has been ${
-                        response.data.isBlocked ? "blocked" : "unblocked"
+                    `User "${updatedUser.name}" has been ${
+                        updatedUser.isBlocked ? "blocked" : "unblocked"
                     }`
                 );
             } else {
@@ -112,9 +113,15 @@ export default function UserPage() {
                             <TableHead className="text-left p-3">
                                 Role
                             </TableHead>
-                            <TableHead className="text-center p-3">
-                                Actions
-                            </TableHead>
+                            {canBlock ? (
+                                <TableHead className="text-left p-3">
+                                    Block/Unblock
+                                </TableHead>
+                            ) : (
+                                <TableHead className="text-left p-3">
+                                    Status
+                                </TableHead>
+                            )}
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -129,18 +136,26 @@ export default function UserPage() {
                                 <TableCell className="p-3">
                                     {user.role.name}
                                 </TableCell>
-                                <TableCell className="p-3 text-center">
-                                    <Button
-                                        variant={
-                                            user.isBlocked
-                                                ? "destructive"
-                                                : "default"
-                                        }
-                                        onClick={() => toggleBlock(user.id)}
-                                    >
-                                        {user.isBlocked ? "Unblock" : "Block"}
-                                    </Button>
-                                </TableCell>
+                                {canBlock ? (
+                                    <TableCell className="p-3 text-center">
+                                        <Button
+                                            variant={
+                                                user.isBlocked
+                                                    ? "destructive"
+                                                    : "default"
+                                            }
+                                            onClick={() => toggleBlock(user.id)}
+                                        >
+                                            {user.isBlocked
+                                                ? "Unblock"
+                                                : "Block"}
+                                        </Button>
+                                    </TableCell>
+                                ) : (
+                                    <TableCell className="p-3 text-center">
+                                        {user.isBlocked ? "Blocked" : "Active"}
+                                    </TableCell>
+                                )}
                             </TableRow>
                         ))}
                     </TableBody>
