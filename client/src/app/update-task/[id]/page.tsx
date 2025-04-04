@@ -4,10 +4,15 @@ import { useEffect, useState } from "react";
 import TaskForm from "@/components/custom/TaskForm";
 import { useParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { checkPermission } from "@/utils/checkPermission";
+import { useUser } from "@/components/custom/hooks/useUser";
+import Unauthorized from "@/components/custom/Unauthorized";
 
 export default function EditTaskPage() {
     const [defaultValues, setDefaultValues] = useState({});
     const { id } = useParams();
+    const { user } = useUser();
+    const permission = checkPermission(user, "UPDATE_TASK");
 
     useEffect(() => {
         const taskData = localStorage.getItem("taskToUpdate");
@@ -16,12 +21,16 @@ export default function EditTaskPage() {
             setDefaultValues({
                 title: task.title,
                 description: task.description,
-                deadline: task.deadline?.substring(0, 10),
+                deadline: task.deadline?.split("T")[0],
                 priority: task.priority,
                 assigneeId: task.assignee.id,
             });
         }
     }, []);
+
+    if (!permission) {
+        return <Unauthorized />;
+    }
 
     if (!defaultValues || Object.keys(defaultValues).length === 0)
         return (
