@@ -17,6 +17,7 @@ import { checkPermission } from "@/utils/checkPermission";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FilePenLine, Trash2 } from "lucide-react";
+import UserTasksDashboardPage from "@/components/custom/UserTasksDashboard";
 
 interface Task {
     id: string;
@@ -37,6 +38,7 @@ interface Task {
 export default function AllTasksDashboardPage() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const { user } = useUser();
+    const isAuthorized = checkPermission(user, "VIEW_TASKS");
 
     useEffect(() => {
         const fetchAllTasks = async () => {
@@ -55,10 +57,15 @@ export default function AllTasksDashboardPage() {
             }
         };
 
-        fetchAllTasks();
-    }, []);
+        if (isAuthorized) {
+            fetchAllTasks();
+        }
+    }, [isAuthorized]);
 
-    if (!checkPermission(user, "VIEW_TASKS")) {
+    if (!isAuthorized) {
+        if (user) {
+            return <UserTasksDashboardPage />;
+        }
         return <Unauthorized />;
     }
     return (
