@@ -36,6 +36,7 @@ interface FormData {
 
 export default function CreateUserForm() {
     const {user} = useUser();
+    const permission = checkPermission(user, "CREATE_USER");
     const [roles, setRoles] = useState<Role[]>([]);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -64,10 +65,10 @@ export default function CreateUserForm() {
             }
         };
 
-        if (checkPermission(user, "USER")) {
+        if (permission) {
             fetchRoles();
         }
-    }, [user, isOpen]);
+    }, [permission, isOpen]);
 
     const onSubmit = async (data: FormData) => {
         try {
@@ -100,7 +101,7 @@ export default function CreateUserForm() {
         }
     };
 
-    if (!checkPermission(user, "USER")) {
+    if (!permission) {
         return <Unauthorized />;
     }
 
