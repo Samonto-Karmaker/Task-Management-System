@@ -18,6 +18,14 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FilePenLine, Trash2 } from "lucide-react";
 import UserTasksDashboardPage from "@/components/custom/UserTasksDashboard";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { TaskStatus } from "@/utils/constant";
 
 interface Task {
     id: string;
@@ -39,6 +47,7 @@ export default function AllTasksDashboardPage() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const { user } = useUser();
     const isAuthorized = checkPermission(user, "VIEW_TASKS");
+    const canChangeStatus = checkPermission(user, "UPDATE_TASK_STATUS");
 
     useEffect(() => {
         const fetchAllTasks = async () => {
@@ -75,6 +84,33 @@ export default function AllTasksDashboardPage() {
                 } else {
                     console.error(response.message);
                     alert(`Failed to delete task: ${response.message}`);
+                }
+            } catch (error) {
+                console.error(error);
+                alert("An error occurred. Please try again later.");
+            }
+        }
+    };
+
+    const handleUpdateTaskStatus = async (
+        taskId: string,
+        status: TaskStatus
+    ) => {
+        if (confirm("Are you sure you want to update this task status?")) {
+            try {
+                const response: ApiResponse = await apiClient.patch(
+                    `/task/update-status/${taskId}`,
+                    { status }
+                );
+                if (response.success) {
+                    setTasks((prevTasks) =>
+                        prevTasks.map((task) =>
+                            task.id === taskId ? { ...task, status } : task
+                        )
+                    );
+                } else {
+                    console.error(response.message);
+                    alert(`Failed to update task status: ${response.message}`);
                 }
             } catch (error) {
                 console.error(error);
@@ -150,7 +186,49 @@ export default function AllTasksDashboardPage() {
                                     {task.deadline.split("T")[0]}
                                 </TableCell>
                                 <TableCell className="p-3">
-                                    {task.status}
+                                    {canChangeStatus &&
+                                    task.status !== TaskStatus.COMPLETED &&
+                                    (user?.id === task.assignee.id ||
+                                        user?.id === task.assigner.id) ? (
+                                        <Select
+                                            defaultValue={task.status}
+                                            onValueChange={(value) =>
+                                                handleUpdateTaskStatus(
+                                                    task.id,
+                                                    value as TaskStatus
+                                                )
+                                            }
+                                        >
+                                            <SelectTrigger className="w-[180px]">
+                                                <SelectValue placeholder="Select status" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {Object.values(TaskStatus).map(
+                                                    (status) => (
+                                                        <SelectItem
+                                                            key={status}
+                                                            value={status}
+                                                        >
+                                                            {status}
+                                                        </SelectItem>
+                                                    )
+                                                )}
+                                            </SelectContent>
+                                        </Select>
+                                    ) : task.status === TaskStatus.COMPLETED ? (
+                                        <span className="text-green-500 font-bold">
+                                            {task.status}
+                                        </span>
+                                    ) : task.status ===
+                                      TaskStatus.IN_PROGRESS ? (
+                                        <span className="text-yellow-500 font-bold">
+                                            {task.status}
+                                        </span>
+                                    ) : (
+                                        <span className="text-red-500 font-bold">
+                                            {task.status}
+                                        </span>
+                                    )}
                                 </TableCell>
                                 <TableCell className="p-3">
                                     {task.assigner.name}
