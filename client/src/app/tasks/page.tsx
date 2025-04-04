@@ -55,6 +55,8 @@ export default function AllTasksDashboardPage() {
     const canUpdateTask = checkPermission(user, "UPDATE_TASK");
     const canDeleteTask = checkPermission(user, "DELETE_TASK");
     const canCreateTask = checkPermission(user, "CREATE_TASK");
+    const canViewAssignedTasks = checkPermission(user, "VIEW_ASSIGNED_TASK");
+    const canViewCreatedTasks = checkPermission(user, "VIEW_TASK_ASSIGNEES");
 
     useEffect(() => {
         const fetchAllTasks = async () => {
@@ -142,13 +144,32 @@ export default function AllTasksDashboardPage() {
     return (
         <main className="container mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-8">All Tasks Dashboard</h1>
-            {canCreateTask && (
-                <Link href="/create-task">
-                    <Button variant="default" className="mb-4">
-                        Create Task
-                    </Button>
-                </Link>
-            )}
+            <div className="flex justify-between mb-4">
+                <div className="flex items-center space-x-4">
+                    {canCreateTask && (
+                        <Link href="/create-task">
+                            <Button className="cursor-pointer">
+                                Create Task
+                            </Button>
+                        </Link>
+                    )}
+                    {canViewAssignedTasks && (
+                        <Link href="/assigned-tasks">
+                            <Button
+                                variant="secondary"
+                                className="cursor-pointer"
+                            >
+                                Assigned Tasks
+                            </Button>
+                        </Link>
+                    )}
+                    {canViewCreatedTasks && (
+                        <Link href="/created-tasks">
+                            <Button variant="secondary">Created Tasks</Button>
+                        </Link>
+                    )}
+                </div>
+            </div>
             <hr className="my-8" />
             <div className="overflow-x-auto">
                 <Table className="min-w-full border border-gray-200 rounded-md">
@@ -172,20 +193,16 @@ export default function AllTasksDashboardPage() {
                             <TableHead className="text-left p-3">
                                 Assignee
                             </TableHead>
-                            {
-                                canUpdateTask && (
-                                    <TableHead className="text-left p-3">
-                                        Update
-                                    </TableHead>
-                                )
-                            }
-                            {
-                                canDeleteTask && (
-                                    <TableHead className="text-left p-3">
-                                        Delete
-                                    </TableHead>
-                                )
-                            }
+                            {canUpdateTask && (
+                                <TableHead className="text-left p-3">
+                                    Update
+                                </TableHead>
+                            )}
+                            {canDeleteTask && (
+                                <TableHead className="text-left p-3">
+                                    Delete
+                                </TableHead>
+                            )}
                         </TableRow>
                     </TableHeader>
                     <TableBody>
