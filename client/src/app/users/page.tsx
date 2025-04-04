@@ -25,13 +25,13 @@ interface UserBaseInfo {
     role: {
         id: string;
         name: string;
-    }
+    };
 }
 
 export default function UserPage() {
     const [users, setUsers] = useState<UserBaseInfo[]>([]);
     const { user } = useUser();
-    
+
     useEffect(() => {
         const fetchUsers = async () => {
             try {
@@ -47,7 +47,7 @@ export default function UserPage() {
                 console.error(error);
                 alert("An error occurred. Please try again later.");
             }
-        }
+        };
 
         if (checkPermission(user, "USER")) {
             fetchUsers();
@@ -56,7 +56,10 @@ export default function UserPage() {
 
     const toggleBlock = async (userId: string) => {
         try {
-            const response: ApiResponse = await apiClient.patch(`/toggle-block/${userId}`, {});
+            const response: ApiResponse = await apiClient.patch(
+                `/toggle-block/${userId}`,
+                {}
+            );
             if (response.success) {
                 const updatedUser = response.data;
                 setUsers(() => {
@@ -70,7 +73,11 @@ export default function UserPage() {
                         return user;
                     });
                 });
-                alert(`User ${userId} has been ${response.data.isBlocked ? "blocked" : "unblocked"}`);
+                alert(
+                    `User ${userId} has been ${
+                        response.data.isBlocked ? "blocked" : "unblocked"
+                    }`
+                );
             } else {
                 console.error(response.message);
                 alert(`Failed to toggle block status: ${response.message}`);
@@ -87,7 +94,7 @@ export default function UserPage() {
 
     return (
         <main className="container mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold mb-8">User Page</h1>
+            <h1 className="text-3xl font-bold mb-8">All Users Dashboard</h1>
             <Link href="/create-user">
                 <Button>Create User</Button>
             </Link>

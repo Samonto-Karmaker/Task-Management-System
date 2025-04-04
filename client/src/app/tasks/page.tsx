@@ -91,7 +91,7 @@ export default function AllTasksDashboardPage() {
     }
     return (
         <main className="container mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold mb-8">User Page</h1>
+            <h1 className="text-3xl font-bold mb-8">All Tasks Dashboard</h1>
             <Link href="/create-task">
                 <Button>Create Task</Button>
             </Link>
