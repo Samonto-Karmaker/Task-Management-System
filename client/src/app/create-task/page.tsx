@@ -19,6 +19,7 @@ import apiClient from "@/lib/apiClient";
 import { useUser } from "@/components/custom/hooks/useUser";
 import { checkPermission } from "@/utils/checkPermission";
 import Unauthorized from "@/components/custom/Unauthorized";
+import { useRouter } from "next/navigation";
 
 interface AssignAbleUser {
     id: string;
@@ -40,6 +41,7 @@ export default function CreateTaskForm() {
         []
     );
     const hasAssignableUsersFetched = useRef(false);
+    const router = useRouter();
 
     const { user } = useUser();
     const isAuthorized =
@@ -79,7 +81,55 @@ export default function CreateTaskForm() {
     }, [isAuthorized]);
 
     const onSubmit = async (data: FormData) => {
-        console.log(data);
+        try {
+            const response: ApiResponse = await apiClient.post("/task", {
+                title: data.title,
+                description: data.description,
+                deadline: new Date(data.deadline).toISOString(),
+                priority: data.priority,
+                assigneeId: data.assigneeId,
+            });
+            if (response.success) {
+                console.log("Task created successfully");
+                setValue("title", "");
+                setValue("description", "");
+                setValue("deadline", "");
+                setValue("priority", Priority.LOW);
+                setValue("assigneeId", "");
+
+                setError("title", { message: "" });
+                setError("description", { message: "" });
+                setError("deadline", { message: "" });
+                setError("priority", { message: "" });
+                setError("assigneeId", { message: "" });
+
+                alert("Task created successfully!");
+                router.push("/tasks");
+            } else if (response.statusCode === 400 && response.data) {
+                const errors = response.data;
+                if (errors.title) {
+                    setError("title", { message: errors.title.msg });
+                }
+                if (errors.description) {
+                    setError("description", { message: errors.description.msg });
+                }
+                if (errors.deadline) {
+                    setError("deadline", { message: errors.deadline.msg });
+                }
+                if (errors.priority) {
+                    setError("priority", { message: errors.priority.msg });
+                }
+                if (errors.assigneeId) {
+                    setError("assigneeId", { message: errors.assigneeId.msg });
+                }
+            } else {
+                console.error("Error creating task:", response.message);
+                alert(`Error creating task: ${response.message}`);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("An error occurred. Please try again later.");
+        }
     };
 
     if (!isAuthorized) {
