@@ -13,27 +13,12 @@ import {
 import UpdateTaskButton from "./UpdateTaskButton";
 import DeleteTaskButton from "./DeleteTaskButton";
 import UpdateTaskStatusSelect from "./UpdateTaskStatusSelect";
-import { Priority, TaskStatus } from "@/utils/constant";
-
-interface UserTaskData {
-    id: string;
-    title: string;
-    priority: Priority;
-    deadline: string;
-    status: TaskStatus;
-    assigner?: {
-        id: string;
-        name: string;
-    };
-    assignee?: {
-        id: string;
-        name: string;
-    };
-}
+import { TaskStatus } from "@/utils/constant";
+import { Task } from "@/types/task";
 
 interface UserTasksDashboardProps {
-    tasks: UserTaskData[];
-    setTasks: React.Dispatch<React.SetStateAction<UserTaskData[]>>;
+    tasks: Task[];
+    setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
     isAssigneeView?: boolean;
 }
 

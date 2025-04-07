@@ -21,23 +21,7 @@ import UpdateTaskStatusSelect from "@/components/custom/UpdateTaskStatusSelect";
 import UpdateTaskButton from "@/components/custom/UpdateTaskButton";
 import { TaskStatus } from "@/utils/constant";
 import { useRouter } from "next/navigation";
-
-interface Task {
-    id: string;
-    title: string;
-    description: string;
-    priority: string;
-    deadline: string;
-    status: string;
-    assigner: {
-        id: string;
-        name: string;
-    };
-    assignee: {
-        id: string;
-        name: string;
-    };
-}
+import { Task } from "@/types/task";
 
 export default function AllTasksDashboardPage() {
     const [tasks, setTasks] = useState<Task[]>([]);
@@ -193,15 +177,15 @@ export default function AllTasksDashboardPage() {
                                         }
                                         canChangeStatus={canChangeStatus}
                                         userId={user?.id || ""}
-                                        assigneeId={task.assignee.id}
-                                        assignerId={task.assigner.id}
+                                        assigneeId={task.assignee?.id}
+                                        assignerId={task.assigner?.id}
                                     />
                                 </TableCell>
                                 <TableCell className="p-3">
-                                    {task.assigner.name}
+                                    {task.assigner?.name}
                                 </TableCell>
                                 <TableCell className="p-3">
-                                    {task.assignee.name}
+                                    {task.assignee?.name}
                                 </TableCell>
                                 {canUpdateTask && (
                                     <TableCell className="p-3">
