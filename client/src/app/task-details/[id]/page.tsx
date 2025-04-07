@@ -10,6 +10,10 @@ import { ApiResponse } from "@/types/api-response";
 import UpdateTaskButton from "@/components/custom/UpdateTaskButton";
 import DeleteTaskButton from "@/components/custom/DeleteTaskButton";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/components/custom/hooks/useUser";
+import { checkPermission } from "@/utils/checkPermission";
+import Loading from "@/components/custom/Loading";
+import Unauthorized from "@/components/custom/Unauthorized";
 
 interface Role {
     id: string;
@@ -41,6 +45,11 @@ export default function TaskDetailsPage() {
     const { id } = useParams();
 
     const router = useRouter();
+    const { user } = useUser();
+
+    const canViewTask = checkPermission(user, "VIEW_TASK");
+    const canUpdateTask = checkPermission(user, "UPDATE_TASK");
+    const canDeleteTask = checkPermission(user, "DELETE_TASK");
 
     useEffect(() => {
         const fetchTask = async () => {
@@ -59,10 +68,11 @@ export default function TaskDetailsPage() {
             }
         };
 
-        if (id) fetchTask();
-    }, [id]);
+        if (id && canViewTask) fetchTask();
+    }, [id, canViewTask]);
 
-    if (!task) return <div className="text-center py-20">Loading...</div>;
+    if (!canViewTask) return <Unauthorized />;
+    if (!task) return <Loading />;
 
     return (
         <main className="container mx-auto max-w-4xl py-10 px-4">
@@ -75,19 +85,17 @@ export default function TaskDetailsPage() {
                             {new Date(task.createdAt).toLocaleDateString()}
                         </p>
                         <div className="flex items-center space-x-2">
-                            <UpdateTaskButton 
-                                task={task}
-                            />
-                            <DeleteTaskButton 
-                                taskId={task.id} 
-                                onDelete={
-                                    () => {
+                            {canUpdateTask && <UpdateTaskButton task={task} />}
+                            {canDeleteTask && (
+                                <DeleteTaskButton
+                                    taskId={task.id}
+                                    onDelete={() => {
                                         setTask(null);
                                         alert("Task deleted successfully.");
                                         router.push("/tasks");
-                                    }
-                                }
-                            />
+                                    }}
+                                />
+                            )}
                         </div>
                     </div>
                 </CardHeader>
