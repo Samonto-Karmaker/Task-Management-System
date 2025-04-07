@@ -8,12 +8,15 @@ import { Task } from "@/types/task";
 import { ApiResponse } from "@/types/api-response";
 import apiClient from "@/lib/apiClient";
 import UserTasksDashboardPage from "@/components/custom/UserTasksDashboard";
+import { checkPermission } from "@/utils/checkPermission";
+import Unauthorized from "@/components/custom/Unauthorized";
 
 export default function AssignedTasks() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState(true);
 
     const { user } = useUser();
+    const canViewAssignedTasks = checkPermission(user, "VIEW_ASSIGNED_TASK");
 
     useEffect(() => {
         const fetchAssignedTasks = async () => {
@@ -46,14 +49,19 @@ export default function AssignedTasks() {
             }
         };
 
-        fetchAssignedTasks();
-    }, [user]);
+        if (canViewAssignedTasks) {
+            fetchAssignedTasks();
+        }
+    }, [user, canViewAssignedTasks]);
 
     if (loading) {
         return <Loading />;
     }
     if (tasks.length === 0) {
         return <EmptyTable />;
+    }
+    if (!canViewAssignedTasks) {
+        return <Unauthorized />
     }
 
     return (
