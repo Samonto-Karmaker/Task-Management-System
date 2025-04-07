@@ -50,7 +50,7 @@ export default function UserPage() {
             }
         };
 
-        if (checkPermission(user, "USER")) {
+        if (checkPermission(user, "VIEW_USERS")) {
             fetchUsers();
         }
     }, [user]);
@@ -89,7 +89,11 @@ export default function UserPage() {
         }
     };
 
-    if (!checkPermission(user, "USER")) {
+    if (!(
+        checkPermission(user, "VIEW_USERS") ||
+        checkPermission(user, "BLOCK_USER") ||
+        checkPermission(user, "CREATE_USER")
+    )) {
         return <Unauthorized />;
     }
 
