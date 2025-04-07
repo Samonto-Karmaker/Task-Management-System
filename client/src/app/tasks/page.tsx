@@ -17,7 +17,6 @@ import { checkPermission } from "@/utils/checkPermission";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FilePenLine, Trash2 } from "lucide-react";
-import UserTasksDashboardPage from "@/components/custom/UserTasksDashboard";
 import {
     Select,
     SelectContent,
@@ -80,6 +79,18 @@ export default function AllTasksDashboardPage() {
         }
     }, [isAuthorized]);
 
+    useEffect(() => {
+        if (!isAuthorized && user) {
+            if (canViewAssignedTasks) {
+                router.push("/assigned-tasks");
+                return;
+            } else if (canViewCreatedTasks) {
+                router.push("/created-tasks");
+                return;
+            }
+        }
+    }, [user, canViewAssignedTasks, canViewCreatedTasks, router, isAuthorized]);
+
     const handleDeleteTask = async (taskId: string) => {
         if (confirm("Are you sure you want to delete this task?")) {
             try {
@@ -136,9 +147,6 @@ export default function AllTasksDashboardPage() {
     };
 
     if (!isAuthorized) {
-        if (user) {
-            return <UserTasksDashboardPage />;
-        }
         return <Unauthorized />;
     }
     return (
