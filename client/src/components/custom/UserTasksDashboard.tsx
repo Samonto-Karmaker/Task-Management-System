@@ -121,8 +121,8 @@ export default function UserTasksDashboardPage({
                                 </TableCell>
                                 <TableCell className="p-3">
                                     {isAssigneeView
-                                        ? task.assignee?.name
-                                        : task.assigner?.name}
+                                        ? task.assigner?.name
+                                        : task.assignee?.name}
                                 </TableCell>
                                 {canUpdateTask && (
                                     <TableCell className="p-3">
