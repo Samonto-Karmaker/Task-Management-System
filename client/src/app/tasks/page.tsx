@@ -16,7 +16,7 @@ import { ApiResponse } from "@/types/api-response";
 import { checkPermission } from "@/utils/checkPermission";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Trash2 } from "lucide-react";
+import DeleteTaskButton from "@/components/custom/DeleteTaskButton";
 import UpdateTaskStatusSelect from "@/components/custom/UpdateTaskStatusSelect";
 import UpdateTaskButton from "@/components/custom/UpdateTaskButton";
 import { TaskStatus } from "@/utils/constant";
@@ -85,27 +85,6 @@ export default function AllTasksDashboardPage() {
             }
         }
     }, [user, canViewAssignedTasks, canViewCreatedTasks, router, isAuthorized]);
-
-    const handleDeleteTask = async (taskId: string) => {
-        if (confirm("Are you sure you want to delete this task?")) {
-            try {
-                const response: ApiResponse = await apiClient.delete(
-                    `/task/${taskId}`
-                );
-                if (response.success) {
-                    setTasks((prevTasks) =>
-                        prevTasks.filter((task) => task.id !== taskId)
-                    );
-                } else {
-                    console.error(response.message);
-                    alert(`Failed to delete task: ${response.message}`);
-                }
-            } catch (error) {
-                console.error(error);
-                alert("An error occurred. Please try again later.");
-            }
-        }
-    };
 
     if (!isAuthorized) {
         return <Unauthorized />;
@@ -231,15 +210,16 @@ export default function AllTasksDashboardPage() {
                                 )}
                                 {canDeleteTask && (
                                     <TableCell className="p-3">
-                                        <Button
-                                            variant="ghost"
-                                            className="text-red-500"
-                                            onClick={() =>
-                                                handleDeleteTask(task.id)
+                                        <DeleteTaskButton
+                                            taskId={task.id}
+                                            onDelete={() =>
+                                                setTasks((prevTasks) =>
+                                                    prevTasks.filter(
+                                                        (t) => t.id !== task.id
+                                                    )
+                                                )
                                             }
-                                        >
-                                            <Trash2 size={20} />
-                                        </Button>
+                                        />
                                     </TableCell>
                                 )}
                             </TableRow>
