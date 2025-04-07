@@ -16,8 +16,9 @@ import { ApiResponse } from "@/types/api-response";
 import { checkPermission } from "@/utils/checkPermission";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FilePenLine, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import UpdateTaskStatusSelect from "@/components/custom/UpdateTaskStatusSelect";
+import UpdateTaskButton from "@/components/custom/UpdateTaskButton";
 import { TaskStatus } from "@/utils/constant";
 import { useRouter } from "next/navigation";
 
@@ -103,13 +104,6 @@ export default function AllTasksDashboardPage() {
                 console.error(error);
                 alert("An error occurred. Please try again later.");
             }
-        }
-    };
-
-    const handleUpdateTask = async (task: Task) => {
-        if (confirm("Are you sure you want to update this task?")) {
-            localStorage.setItem("taskToUpdate", JSON.stringify(task));
-            router.push(`/update-task/${task.id}`);
         }
     };
 
@@ -224,7 +218,6 @@ export default function AllTasksDashboardPage() {
                                         assignerId={task.assigner.id}
                                     />
                                 </TableCell>
-
                                 <TableCell className="p-3">
                                     {task.assigner.name}
                                 </TableCell>
@@ -233,14 +226,7 @@ export default function AllTasksDashboardPage() {
                                 </TableCell>
                                 {canUpdateTask && (
                                     <TableCell className="p-3">
-                                        <Button
-                                            variant="ghost"
-                                            onClick={() =>
-                                                handleUpdateTask(task)
-                                            }
-                                        >
-                                            <FilePenLine size={20} />
-                                        </Button>
+                                        <UpdateTaskButton task={task} />
                                     </TableCell>
                                 )}
                                 {canDeleteTask && (
