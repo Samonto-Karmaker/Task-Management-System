@@ -18,8 +18,8 @@ interface Props {
     onStatusChange: (status: TaskStatus) => void;
     canChangeStatus: boolean;
     userId: string;
-    assigneeId: string;
-    assignerId: string;
+    assigneeId?: string;
+    assignerId?: string;
 }
 
 export default function UpdateTaskStatusSelect({
