@@ -14,6 +14,8 @@ import { useUser } from "@/components/custom/hooks/useUser";
 import { checkPermission } from "@/utils/checkPermission";
 import Loading from "@/components/custom/Loading";
 import Unauthorized from "@/components/custom/Unauthorized";
+import UpdateTaskStatusSelect from "@/components/custom/UpdateTaskStatusSelect";
+import { Priority, TaskStatus } from "@/utils/constant";
 
 interface Role {
     id: string;
@@ -31,9 +33,9 @@ interface Task {
     id: string;
     title: string;
     description: string;
-    priority: string;
+    priority: Priority;
     deadline: string;
-    status: string;
+    status: TaskStatus;
     updatedAt: string;
     createdAt: string;
     assigner: User;
@@ -50,6 +52,7 @@ export default function TaskDetailsPage() {
     const canViewTask = checkPermission(user, "VIEW_TASK");
     const canUpdateTask = checkPermission(user, "UPDATE_TASK");
     const canDeleteTask = checkPermission(user, "DELETE_TASK");
+    const canChangeStatus = checkPermission(user, "UPDATE_TASK_STATUS");
 
     useEffect(() => {
         const fetchTask = async () => {
@@ -130,17 +133,25 @@ export default function TaskDetailsPage() {
                             <p className="text-sm text-muted-foreground">
                                 Status
                             </p>
-                            <Badge
-                                className={`${
-                                    task.status === "COMPLETED"
-                                        ? "bg-green-500"
-                                        : task.status === "IN_PROGRESS"
-                                        ? "bg-yellow-500"
-                                        : "bg-red-500"
-                                }`}
-                            >
-                                {task.status}
-                            </Badge>
+                            <UpdateTaskStatusSelect 
+                                taskId={task.id}
+                                currentStatus={task.status}
+                                onStatusChange={(newStatus) => {
+                                    setTask((prevTask) => {
+                                        if (prevTask) {
+                                            return {
+                                                ...prevTask,
+                                                status: newStatus,
+                                            };
+                                        }
+                                        return null;
+                                    });
+                                }}
+                                canChangeStatus={canChangeStatus}
+                                userId={user?.id || ""}
+                                assigneeId={task.assignee?.id}
+                                assignerId={task.assigner?.id}
+                            />
                         </div>
                         <div>
                             <p className="text-sm text-muted-foreground">
