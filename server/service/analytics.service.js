@@ -67,16 +67,7 @@ export const getTasksWithUpcomingDeadlinesByUser = async (userId, days) => {
         throw new ApiError("Days must be a positive number", 400);
     }
     try {
-        // Get current date in UTC, at 00:00
-        const now = new Date();
-        const utcStart = new Date(
-            Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
-        );
-
-        // Get end date in UTC (days from now at 23:59:59.999)
-        const endDate = new Date(
-            utcStart.getTime() + days * 24 * 60 * 60 * 1000 - 1
-        );
+        const { startDate, endDate } = getDateRange(days);
 
         const upcomingTasks = await prisma.task.findMany({
             where: {
@@ -85,7 +76,7 @@ export const getTasksWithUpcomingDeadlinesByUser = async (userId, days) => {
                     status: TaskStatus.COMPLETED,
                 },
                 deadline: {
-                    gte: utcStart,
+                    gte: startDate,
                     lte: endDate,
                 },
             },
@@ -111,6 +102,7 @@ export const getTasksWithOverdueDeadlinesByUser = async (userId) => {
         throw new ApiError("User ID is required", 400);
     }
     try {
+        const { startDate, _ } = getDateRange(0); // Get current date in UTC, at 00:00
         const overdueTasks = await prisma.task.findMany({
             where: {
                 OR: [{ assigneeId: userId }, { assignerId: userId }],
@@ -118,7 +110,7 @@ export const getTasksWithOverdueDeadlinesByUser = async (userId) => {
                     status: TaskStatus.COMPLETED,
                 },
                 deadline: {
-                    lt: new Date(),
+                    lt: startDate,
                 },
             },
             select: {
@@ -142,6 +134,7 @@ export const workloadByUser = async (userId) => {
     if (!userId) {
         throw new ApiError("User ID is required", 400);
     }
+    const { startDate, endDate } = getDateRange(7);
     try {
         const [taskInHand, taskManaging, tasksWithUpcoming, tasksWithOverdue] =
             await Promise.all([
@@ -168,8 +161,8 @@ export const workloadByUser = async (userId) => {
                             status: TaskStatus.COMPLETED,
                         },
                         deadline: {
-                            gte: new Date(),
-                            lte: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                            gte: startDate,
+                            lte: endDate,
                         },
                     },
                 }),
@@ -179,7 +172,7 @@ export const workloadByUser = async (userId) => {
                         NOT: {
                             status: TaskStatus.COMPLETED,
                         },
-                        deadline: { lt: new Date() },
+                        deadline: { lt: startDate },
                     },
                 }),
             ]);
@@ -194,4 +187,20 @@ export const workloadByUser = async (userId) => {
         console.error("Error fetching workload by user:", error);
         throw new ApiError(500, "Internal Server Error");
     }
+};
+
+// Helper function
+const getDateRange = (days) => {
+    // Get current date in UTC, at 00:00
+    const now = new Date();
+    const startDate = new Date(
+        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+    );
+
+    // Get end date in UTC (days from now at 23:59:59.999)
+    const endDate = new Date(
+        startDate.getTime() + days * 24 * 60 * 60 * 1000 - 1
+    );
+
+    return { startDate, endDate };
 };
