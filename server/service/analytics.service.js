@@ -12,10 +12,9 @@ export const getAssignedTaskStatusStatsByUser = async (userId) => {
             where: {
                 assigneeId: userId,
             },
-            select: {
+            _count: {
                 status: true,
-                _count: true,
-            },
+            }
         });
 
         return statusStats;
@@ -35,10 +34,9 @@ export const getCreatedTaskStatusStatsByUser = async (userId) => {
             where: {
                 assignerId: userId,
             },
-            select: {
+            _count: {
                 status: true,
-                _count: true,
-            },
+            }
         });
 
         return statusStats;
