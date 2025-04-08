@@ -73,6 +73,9 @@ export const getTasksWithUpcomingDeadlinesByUser = async (userId, days) => {
                 title: true,
                 deadline: true,
             },
+            orderBy: {
+                deadline: "asc",
+            }
         });
 
         return upcomingTasks;
@@ -102,6 +105,9 @@ export const getTasksWithOverdueDeadlinesByUser = async (userId) => {
                 title: true,
                 deadline: true,
             },
+            orderBy: {
+                deadline: "asc",
+            }
         });
 
         return overdueTasks;
