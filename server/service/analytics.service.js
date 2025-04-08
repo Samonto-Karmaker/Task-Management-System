@@ -14,10 +14,15 @@ export const getAssignedTaskStatusStatsByUser = async (userId) => {
             },
             _count: {
                 status: true,
-            }
+            },
         });
 
-        return statusStats;
+        const normalizedStats = statusStats.reduce((acc, item) => {
+            acc[item.status] = item._count.status;
+            return acc;
+        }, {});
+
+        return normalizedStats;
     } catch (error) {
         console.error("Error fetching assigned task status stats:", error);
         throw new ApiError(500, "Internal Server Error");
@@ -36,10 +41,15 @@ export const getCreatedTaskStatusStatsByUser = async (userId) => {
             },
             _count: {
                 status: true,
-            }
+            },
         });
 
-        return statusStats;
+        const normalizedStats = statusStats.reduce((acc, item) => {
+            acc[item.status] = item._count.status;
+            return acc;
+        }, {});
+
+        return normalizedStats;
     } catch (error) {
         console.error("Error fetching created task status stats:", error);
         throw new ApiError(500, "Internal Server Error");
@@ -75,7 +85,7 @@ export const getTasksWithUpcomingDeadlinesByUser = async (userId, days) => {
             },
             orderBy: {
                 deadline: "asc",
-            }
+            },
         });
 
         return upcomingTasks;
@@ -107,7 +117,7 @@ export const getTasksWithOverdueDeadlinesByUser = async (userId) => {
             },
             orderBy: {
                 deadline: "asc",
-            }
+            },
         });
 
         return overdueTasks;
