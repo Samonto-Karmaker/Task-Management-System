@@ -141,7 +141,12 @@ export default function AllTasksDashboardPage() {
                         {tasks.map((task) => (
                             <TableRow key={task.id} className="border-b">
                                 <TableCell className="p-3">
-                                    {task.title}
+                                    <Link
+                                        href={`/task-details/${task.id}`}
+                                        className="font-bold text-blue-500 hover:text-blue-800"
+                                    >
+                                        {task.title}
+                                    </Link>
                                 </TableCell>
                                 <TableCell className="p-3">
                                     {task.priority}
