@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useUser } from "./hooks/useUser";
 import { ApiResponse } from "@/types/api-response";
 import apiClient from "@/lib/apiClient";
+import Link from "next/link";
 
 // Define interfaces for the data structure
 interface Task {
@@ -95,7 +96,14 @@ const TaskList = ({ tasks, label }: TaskListProps) => (
             <ul className="space-y-1">
                 {tasks.map((task) => (
                     <li key={task.id} className="flex justify-between">
-                        <span>{task.title}</span>
+                        <span>
+                            <Link
+                                href={`/task-details/${task.id}`}
+                                className="font-bold text-blue-500 hover:text-blue-800"
+                            >
+                                {task.title}
+                            </Link>
+                        </span>
                         <Badge>{task.deadline.split("T")[0]}</Badge>
                     </li>
                 ))}
