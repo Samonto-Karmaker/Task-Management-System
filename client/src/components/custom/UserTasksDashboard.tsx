@@ -13,7 +13,7 @@ import {
 import UpdateTaskButton from "./UpdateTaskButton";
 import DeleteTaskButton from "./DeleteTaskButton";
 import UpdateTaskStatusSelect from "./UpdateTaskStatusSelect";
-import { TaskStatus } from "@/utils/constant";
+import { TaskStatus, UserPermissions } from "@/utils/constant";
 import { Task } from "@/types/task";
 import Link from "next/link";
 
@@ -29,9 +29,9 @@ export default function UserTasksDashboardPage({
     isAssigneeView = true,
 }: UserTasksDashboardProps) {
     const { user } = useUser();
-    const canChangeStatus = checkPermission(user, "UPDATE_TASK_STATUS");
-    const canUpdateTask = checkPermission(user, "UPDATE_TASK");
-    const canDeleteTask = checkPermission(user, "DELETE_TASK");
+    const canChangeStatus = checkPermission(user, UserPermissions.UPDATE_TASK_STATUS);
+    const canUpdateTask = checkPermission(user, UserPermissions.UPDATE_TASK);
+    const canDeleteTask = checkPermission(user, UserPermissions.DELETE_TASK);
 
     return (
         <div className="flex flex-col gap-4">

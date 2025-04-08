@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useUser } from "./hooks/useUser";
 import { checkPermission } from "@/utils/checkPermission";
 import { User } from "@/types/user";
+import { UserPermissions } from "@/utils/constant";
 
 const Sidebar = () => {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -50,9 +51,9 @@ const SidebarContent = ({
     ];
 
     if (
-        checkPermission(user, "VIEW_USERS") ||
-        checkPermission(user, "BLOCK_USER") ||
-        checkPermission(user, "CREATE_USER")
+        checkPermission(user, UserPermissions.VIEW_USERS) ||
+        checkPermission(user, UserPermissions.BLOCK_USER) ||
+        checkPermission(user, UserPermissions.CREATE_USER)
     ) {
         links.push({ name: "User", href: "/users", icon: Users });
     }

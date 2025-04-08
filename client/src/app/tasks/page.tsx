@@ -19,7 +19,7 @@ import { useEffect, useState } from "react";
 import DeleteTaskButton from "@/components/custom/DeleteTaskButton";
 import UpdateTaskStatusSelect from "@/components/custom/UpdateTaskStatusSelect";
 import UpdateTaskButton from "@/components/custom/UpdateTaskButton";
-import { TaskStatus } from "@/utils/constant";
+import { TaskStatus, UserPermissions } from "@/utils/constant";
 import { useRouter } from "next/navigation";
 import { Task } from "@/types/task";
 
@@ -28,13 +28,13 @@ export default function AllTasksDashboardPage() {
     const { user } = useUser();
     const router = useRouter();
 
-    const isAuthorized = checkPermission(user, "VIEW_TASKS");
-    const canChangeStatus = checkPermission(user, "UPDATE_TASK_STATUS");
-    const canUpdateTask = checkPermission(user, "UPDATE_TASK");
-    const canDeleteTask = checkPermission(user, "DELETE_TASK");
-    const canCreateTask = checkPermission(user, "CREATE_TASK");
-    const canViewAssignedTasks = checkPermission(user, "VIEW_ASSIGNED_TASK");
-    const canViewCreatedTasks = checkPermission(user, "VIEW_TASK_ASSIGNEES");
+    const isAuthorized = checkPermission(user, UserPermissions.VIEW_TASKS);
+    const canChangeStatus = checkPermission(user, UserPermissions.UPDATE_TASK_STATUS);
+    const canUpdateTask = checkPermission(user, UserPermissions.UPDATE_TASK);
+    const canDeleteTask = checkPermission(user, UserPermissions.DELETE_TASK);
+    const canCreateTask = checkPermission(user, UserPermissions.CREATE_TASK);
+    const canViewAssignedTasks = checkPermission(user, UserPermissions.VIEW_ASSIGNED_TASK);
+    const canViewCreatedTasks = checkPermission(user, UserPermissions.VIEW_TASK_ASSIGNEES);
 
     useEffect(() => {
         const fetchAllTasks = async () => {

@@ -20,6 +20,7 @@ import { useUser } from "@/components/custom/hooks/useUser";
 import { checkPermission } from "@/utils/checkPermission";
 import Unauthorized from "@/components/custom/Unauthorized";
 import CreateRoleForm from "@/components/custom/CreateRoleForm";
+import { UserPermissions } from "@/utils/constant";
 
 interface Role {
     id: number;
@@ -36,7 +37,7 @@ interface FormData {
 
 export default function CreateUserForm() {
     const {user} = useUser();
-    const permission = checkPermission(user, "CREATE_USER");
+    const permission = checkPermission(user, UserPermissions.CREATE_USER);
     const [roles, setRoles] = useState<Role[]>([]);
     const [isOpen, setIsOpen] = useState(false);
 

@@ -14,6 +14,7 @@ import {
 import apiClient from "@/lib/apiClient";
 import { ApiResponse } from "@/types/api-response";
 import { checkPermission } from "@/utils/checkPermission";
+import { UserPermissions } from "@/utils/constant";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -31,7 +32,7 @@ interface UserBaseInfo {
 export default function UserPage() {
     const [users, setUsers] = useState<UserBaseInfo[]>([]);
     const { user } = useUser();
-    const canBlock = checkPermission(user, "BLOCK_USER");
+    const canBlock = checkPermission(user, UserPermissions.BLOCK_USER);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -50,7 +51,7 @@ export default function UserPage() {
             }
         };
 
-        if (checkPermission(user, "VIEW_USERS")) {
+        if (checkPermission(user, UserPermissions.VIEW_USERS)) {
             fetchUsers();
         }
     }, [user]);
@@ -90,9 +91,9 @@ export default function UserPage() {
     };
 
     if (!(
-        checkPermission(user, "VIEW_USERS") ||
-        checkPermission(user, "BLOCK_USER") ||
-        checkPermission(user, "CREATE_USER")
+        checkPermission(user, UserPermissions.VIEW_USERS) ||
+        checkPermission(user, UserPermissions.BLOCK_USER) ||
+        checkPermission(user, UserPermissions.CREATE_USER)
     )) {
         return <Unauthorized />;
     }

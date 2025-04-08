@@ -15,7 +15,7 @@ import { checkPermission } from "@/utils/checkPermission";
 import Loading from "@/components/custom/Loading";
 import Unauthorized from "@/components/custom/Unauthorized";
 import UpdateTaskStatusSelect from "@/components/custom/UpdateTaskStatusSelect";
-import { Priority, TaskStatus } from "@/utils/constant";
+import { Priority, TaskStatus, UserPermissions } from "@/utils/constant";
 
 interface Role {
     id: string;
@@ -49,10 +49,10 @@ export default function TaskDetailsPage() {
     const router = useRouter();
     const { user } = useUser();
 
-    const canViewTask = checkPermission(user, "VIEW_TASK");
-    const canUpdateTask = checkPermission(user, "UPDATE_TASK");
-    const canDeleteTask = checkPermission(user, "DELETE_TASK");
-    const canChangeStatus = checkPermission(user, "UPDATE_TASK_STATUS");
+    const canViewTask = checkPermission(user, UserPermissions.VIEW_TASK);
+    const canUpdateTask = checkPermission(user, UserPermissions.UPDATE_TASK);
+    const canDeleteTask = checkPermission(user, UserPermissions.DELETE_TASK);
+    const canChangeStatus = checkPermission(user, UserPermissions.UPDATE_TASK_STATUS);
 
     useEffect(() => {
         const fetchTask = async () => {

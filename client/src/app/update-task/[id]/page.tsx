@@ -7,12 +7,13 @@ import { Loader2 } from "lucide-react";
 import { checkPermission } from "@/utils/checkPermission";
 import { useUser } from "@/components/custom/hooks/useUser";
 import Unauthorized from "@/components/custom/Unauthorized";
+import { UserPermissions } from "@/utils/constant";
 
 export default function EditTaskPage() {
     const [defaultValues, setDefaultValues] = useState({});
     const { id } = useParams();
     const { user } = useUser();
-    const permission = checkPermission(user, "UPDATE_TASK");
+    const permission = checkPermission(user, UserPermissions.UPDATE_TASK);
 
     useEffect(() => {
         const taskData = localStorage.getItem("taskToUpdate");

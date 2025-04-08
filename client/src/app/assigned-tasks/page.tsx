@@ -12,15 +12,22 @@ import { checkPermission } from "@/utils/checkPermission";
 import Unauthorized from "@/components/custom/Unauthorized";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { UserPermissions } from "@/utils/constant";
 
 export default function AssignedTasks() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState(true);
 
     const { user } = useUser();
-    const canCreateTask = checkPermission(user, "CREATE_TASK");
-    const canViewAssignedTasks = checkPermission(user, "VIEW_ASSIGNED_TASK");
-    const canViewCreatedTasks = checkPermission(user, "VIEW_TASK_ASSIGNEES");
+    const canCreateTask = checkPermission(user, UserPermissions.CREATE_TASK);
+    const canViewAssignedTasks = checkPermission(
+        user,
+        UserPermissions.VIEW_ASSIGNED_TASK
+    );
+    const canViewCreatedTasks = checkPermission(
+        user,
+        UserPermissions.VIEW_TASK_ASSIGNEES
+    );
 
     useEffect(() => {
         const fetchAssignedTasks = async () => {
