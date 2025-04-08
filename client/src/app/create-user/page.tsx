@@ -36,8 +36,9 @@ interface FormData {
 }
 
 export default function CreateUserForm() {
-    const {user} = useUser();
-    const permission = checkPermission(user, UserPermissions.CREATE_USER);
+    const { user } = useUser();
+    const canCreateUser = checkPermission(user, UserPermissions.CREATE_USER);
+    const canCreateRole = checkPermission(user, UserPermissions.CREATE_ROLE);
     const [roles, setRoles] = useState<Role[]>([]);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -66,10 +67,10 @@ export default function CreateUserForm() {
             }
         };
 
-        if (permission) {
+        if (canCreateUser) {
             fetchRoles();
         }
-    }, [permission, isOpen]);
+    }, [canCreateUser, isOpen]);
 
     const onSubmit = async (data: FormData) => {
         try {
@@ -78,7 +79,7 @@ export default function CreateUserForm() {
                 email: data.email,
                 password: data.password,
                 roleId: data.roleId,
-            })
+            });
 
             if (response.success) {
                 console.log("User created successfully");
@@ -102,7 +103,7 @@ export default function CreateUserForm() {
         }
     };
 
-    if (!permission) {
+    if (!canCreateUser) {
         return <Unauthorized />;
     }
 
@@ -113,9 +114,15 @@ export default function CreateUserForm() {
                     <CardTitle className="text-2xl font-bold text-center">
                         Create User
                     </CardTitle>
-                    <Button variant="outline" className="w-full my-4" onClick={() => setIsOpen(true)}>
-                        + Create New Role
-                    </Button>
+                    {canCreateRole && (
+                        <Button
+                            variant="outline"
+                            className="w-full my-4"
+                            onClick={() => setIsOpen(true)}
+                        >
+                            + Create New Role
+                        </Button>
+                    )}
                 </CardHeader>
                 <CardContent>
                     <form
@@ -231,7 +238,9 @@ export default function CreateUserForm() {
                     </form>
                 </CardContent>
             </Card>
-            <CreateRoleForm isOpen={isOpen} setIsOpen={setIsOpen} />
+            {canCreateRole && (
+                <CreateRoleForm isOpen={isOpen} setIsOpen={setIsOpen} />
+            )}
         </div>
     );
 }
