@@ -70,7 +70,10 @@ export const getTasksWithUpcomingDeadlinesByUserController = async (
     }
 };
 
-export const getTasksWithOverdueDeadlinesByUserController = async (req, res) => {
+export const getTasksWithOverdueDeadlinesByUserController = async (
+    req,
+    res
+) => {
     let { userId } = req.params;
     if (!userId) {
         userId = req.user.id;
@@ -87,7 +90,7 @@ export const getTasksWithOverdueDeadlinesByUserController = async (req, res) => 
     } catch (error) {
         finalResErrorHandler(error, res);
     }
-}
+};
 
 export const getWorkloadByUserController = async (req, res) => {
     let { userId } = req.params;
@@ -102,4 +105,60 @@ export const getWorkloadByUserController = async (req, res) => {
     } catch (error) {
         finalResErrorHandler(error, res);
     }
-}
+};
+
+export const getAllAnalyticsDataController = async (req, res) => {
+    let { userId } = req.params;
+    let { days } = req.query;
+
+    if (!userId) {
+        userId = req.user.id; // Use the logged-in user's ID if not provided
+    }
+
+    days = parseInt(days, 10) || 7; // Default to 7 days if not provided
+
+    try {
+        // Fetch all analytics data using Promise.allSettled
+        const results = await Promise.allSettled([
+            getAssignedTaskStatusStatsByUser(userId),
+            getCreatedTaskStatusStatsByUser(userId),
+            getTasksWithUpcomingDeadlinesByUser(userId, days),
+            getTasksWithOverdueDeadlinesByUser(userId),
+            workloadByUser(userId),
+        ]);
+
+        // Map the results to a structured response
+        const analyticsData = {
+            assignedTaskStats:
+                results[0].status === "fulfilled"
+                    ? results[0].value
+                    : { error: results[0].reason.message },
+            createdTaskStats:
+                results[1].status === "fulfilled"
+                    ? results[1].value
+                    : { error: results[1].reason.message },
+            upcomingDeadlines:
+                results[2].status === "fulfilled"
+                    ? results[2].value
+                    : { error: results[2].reason.message },
+            overdueDeadlines:
+                results[3].status === "fulfilled"
+                    ? results[3].value
+                    : { error: results[3].reason.message },
+            workload:
+                results[4].status === "fulfilled"
+                    ? results[4].value
+                    : { error: results[4].reason.message },
+        };
+
+        res.status(200).json(
+            new ApiResponse(
+                200,
+                "All analytics data retrieved successfully",
+                analyticsData
+            )
+        );
+    } catch (error) {
+        finalResErrorHandler(error, res);
+    }
+};

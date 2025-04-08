@@ -4,6 +4,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useEffect, useState } from "react";
+import { useUser } from "./hooks/useUser";
+import { ApiResponse } from "@/types/api-response";
+import apiClient from "@/lib/apiClient";
 
 // Define interfaces for the data structure
 interface Task {
@@ -92,7 +96,7 @@ const TaskList = ({ tasks, label }: TaskListProps) => (
                 {tasks.map((task) => (
                     <li key={task.id} className="flex justify-between">
                         <span>{task.title}</span>
-                        <Badge>{task.deadline}</Badge>
+                        <Badge>{task.deadline.split("T")[0]}</Badge>
                     </li>
                 ))}
             </ul>
@@ -101,13 +105,61 @@ const TaskList = ({ tasks, label }: TaskListProps) => (
 );
 
 export default function Dashboard() {
-    const {
-        assignedTasks,
-        createdTasks,
-        upcomingDeadlines,
-        overdueDeadlines,
-        workload,
-    } = dummyPerformanceData;
+    const [assignedTasks, setAssignedTasks] = useState<TaskStatusStats>(
+        dummyPerformanceData.assignedTasks
+    );
+    const [createdTasks, setCreatedTasks] = useState<TaskStatusStats>(
+        dummyPerformanceData.createdTasks
+    );
+    const [upcomingDeadlines, setUpcomingDeadlines] = useState<Task[]>(
+        dummyPerformanceData.upcomingDeadlines
+    );
+    const [overdueDeadlines, setOverdueDeadlines] = useState<Task[]>(
+        dummyPerformanceData.overdueDeadlines
+    );
+    const [workload, setWorkload] = useState<Workload>(
+        dummyPerformanceData.workload
+    );
+
+    const { user } = useUser();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // Fetch analytics data from the backend
+                const response: ApiResponse = await apiClient.get(
+                    `/analytics/${user?.id}`
+                );
+
+                if (response.success) {
+                    const analyticsData = response.data;
+
+                    // Update state with the fetched data
+                    setAssignedTasks(analyticsData.assignedTaskStats || {});
+                    setCreatedTasks(analyticsData.createdTaskStats || {});
+                    setUpcomingDeadlines(analyticsData.upcomingDeadlines || []);
+                    setOverdueDeadlines(analyticsData.overdueDeadlines || []);
+                    setWorkload(analyticsData.workload || {});
+                } else {
+                    console.error(
+                        "Failed to fetch analytics data:",
+                        response.message
+                    );
+                    alert(`Error: ${response.message}`);
+                }
+            } catch (error) {
+                console.error(
+                    "An error occurred while fetching analytics data:",
+                    error
+                );
+                alert("An error occurred. Please try again later.");
+            }
+        };
+
+        if (user?.id) {
+            fetchData();
+        }
+    }, [user]);
 
     // Define the type for the `data` parameter in `renderStatusBars`
     const renderStatusBars = (data: TaskStatusStats) => {

@@ -6,12 +6,16 @@ import {
     getTasksWithUpcomingDeadlinesByUserController,
     getTasksWithOverdueDeadlinesByUserController,
     getWorkloadByUserController,
+    getAllAnalyticsDataController,
 } from "../controller/analytics..controller.js";
 
 const analyticsRouter = Router();
 
 // Middleware to ensure the user is authenticated
 analyticsRouter.use(checkAuth);
+
+// Route to get all the performance data at once
+analyticsRouter.get("/:userId?", getAllAnalyticsDataController);
 
 // Route to get assigned task status stats by user
 analyticsRouter.get(
