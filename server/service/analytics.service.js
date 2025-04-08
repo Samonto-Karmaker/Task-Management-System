@@ -67,6 +67,17 @@ export const getTasksWithUpcomingDeadlinesByUser = async (userId, days) => {
         throw new ApiError("Days must be a positive number", 400);
     }
     try {
+        // Get current date in UTC, at 00:00
+        const now = new Date();
+        const utcStart = new Date(
+            Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+        );
+
+        // Get end date in UTC (days from now at 23:59:59.999)
+        const endDate = new Date(
+            utcStart.getTime() + days * 24 * 60 * 60 * 1000 - 1
+        );
+
         const upcomingTasks = await prisma.task.findMany({
             where: {
                 OR: [{ assigneeId: userId }, { assignerId: userId }],
@@ -74,8 +85,8 @@ export const getTasksWithUpcomingDeadlinesByUser = async (userId, days) => {
                     status: TaskStatus.COMPLETED,
                 },
                 deadline: {
-                    gte: new Date(),
-                    lte: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
+                    gte: utcStart,
+                    lte: endDate,
                 },
             },
             select: {
