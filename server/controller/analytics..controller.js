@@ -9,7 +9,7 @@ import ApiResponse from "../util/ApiResponse.js";
 import { finalResErrorHandler } from "../util/finalResErrorHandler.js";
 
 export const getAssignedTaskStatusStatsByUserController = async (req, res) => {
-    const { userId } = req.params;
+    let { userId } = req.params;
     if (!userId) {
         userId = req.user.id;
     }
@@ -28,7 +28,7 @@ export const getAssignedTaskStatusStatsByUserController = async (req, res) => {
 };
 
 export const getCreatedTaskStatusStatsByUserController = async (req, res) => {
-    const { userId } = req.params;
+    let { userId } = req.params;
     if (!userId) {
         userId = req.user.id;
     }
@@ -50,7 +50,7 @@ export const getTasksWithUpcomingDeadlinesByUserController = async (
     req,
     res
 ) => {
-    const { userId } = req.params;
+    let { userId } = req.params;
     let { days } = req.query;
     days = parseInt(days, 10) || 7;
     if (!userId) {
@@ -71,7 +71,7 @@ export const getTasksWithUpcomingDeadlinesByUserController = async (
 };
 
 export const getTasksWithOverdueDeadlinesByUserController = async (req, res) => {
-    const { userId } = req.params;
+    let { userId } = req.params;
     if (!userId) {
         userId = req.user.id;
     }
@@ -90,7 +90,7 @@ export const getTasksWithOverdueDeadlinesByUserController = async (req, res) => 
 }
 
 export const getWorkloadByUserController = async (req, res) => {
-    const { userId } = req.params;
+    let { userId } = req.params;
     if (!userId) {
         userId = req.user.id;
     }
