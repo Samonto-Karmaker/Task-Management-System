@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ApiResponse } from "@/types/api-response";
@@ -82,11 +82,6 @@ export default function NotificationsPage() {
 
                     return (
                         <Card key={notification.id}>
-                            <CardHeader>
-                                <CardTitle className="text-lg font-semibold">
-                                    Notification
-                                </CardTitle>
-                            </CardHeader>
                             <CardContent>
                                 <p className="text-sm text-gray-700">
                                     {shouldTruncate
