@@ -53,7 +53,25 @@ export const getInAppNotifications = async (userId) => {
     }
 };
 
-export const markNotificationsAsRead = async (notificationIds) => {};
+export const markNotificationsAsRead = async (notificationIds) => {
+    if (!notificationIds || notificationIds.length === 0) {
+        throw new ApiError(400, "Missing required fields");
+    }
+    try {
+        const notifications = await prisma.notification.updateMany({
+            where: {
+                id: { in: notificationIds },
+                isRead: false,
+            },
+            data: { isRead: true },
+        });
+        return notifications.count;
+    } catch (error) {
+        console.error(error);
+        if (error instanceof ApiError) throw error;
+        throw new ApiError(500, "Internal Server Error");
+    }
+};
 
 export const sendInAppNotification = async (notificationId) => {};
 
