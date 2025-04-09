@@ -41,10 +41,13 @@ export const getInAppNotifications = async (userId) => {
                 id: true,
                 content: true,
                 createdAt: true,
-                isRead: true,
             },
             orderBy: { createdAt: "desc" },
         });
+
+        const notificationIds = notifications.map((notification) => notification.id);
+        markNotificationsAsRead(notificationIds);
+
         return notifications;
     } catch (error) {
         console.error(error);
