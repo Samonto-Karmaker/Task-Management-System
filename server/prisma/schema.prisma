@@ -46,39 +46,39 @@ model Task {
 }
 
 model Notification {
-  id        String   @id @default(uuid())
+  id        String           @id @default(uuid())
   content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  type      NotificationType @default(IN_APP)
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
   sendToId  String
-  sendTo    User     @relation(fields: [sendToId], references: [id])
+  sendTo    User             @relation(fields: [sendToId], references: [id])
 
   @@index([sendToId]) // Index on sendToId for quick lookups by recipient
   @@index([createdAt]) // Index on createdAt for quick sorting/filtering by creation date
 }
 
 model Role {
-  id             String           @id @default(uuid())
-  name           String           @unique
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  users          User[]
-  permissions    Permission[]     @relation("RolePermissions")
+  id          String       @id @default(uuid())
+  name        String       @unique
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  users       User[]
+  permissions Permission[] @relation("RolePermissions")
 
   @@index([name]) // Index on name for quick lookups by role name
 }
 
 model Permission {
-  id             String           @id @default(uuid())
-  name           String           @unique
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  roles          Role[]           @relation("RolePermissions")
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  roles     Role[]   @relation("RolePermissions")
 
   @@index([name]) // Index on name for quick lookups by permission name
 }
-
-
 
 enum Priority {
   LOW
@@ -90,4 +90,10 @@ enum TaskStatus {
   PENDING
   IN_PROGRESS
   COMPLETED
+}
+
+enum NotificationType {
+  EMAIL
+  IN_APP
+  SCHEDULED
 }
