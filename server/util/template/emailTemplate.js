@@ -1,7 +1,10 @@
+import ApiError from "../ApiError";
+
 export const EmailTemplates = {
     USER_CREATED: (userName, email, tempPassword) => {
         if (!userName || !email || !tempPassword) {
-            throw new Error(
+            throw new ApiError(
+                400,
                 "Missing required parameters for USER_CREATED template"
             );
         }
@@ -24,7 +27,8 @@ TaskPro Team`,
 
     USER_BLOCKED: (userName) => {
         if (!userName) {
-            throw new Error(
+            throw new ApiError(
+                400,
                 "Missing required parameter for USER_BLOCKED template"
             );
         }
@@ -51,7 +55,8 @@ TaskPro Team`,
             !task.priority ||
             !task.assigner
         ) {
-            throw new Error(
+            throw new ApiError(
+                400,
                 "Missing required parameters for TASK_ASSIGNED template"
             );
         }
@@ -84,7 +89,8 @@ TaskPro Team`,
 
     TASK_UNASSIGNED: (userName, taskTitle, newAssignee, assigner) => {
         if (!userName || !taskTitle || !newAssignee || !assigner) {
-            throw new Error(
+            throw new ApiError(
+                400,
                 "Missing required parameters for TASK_UNASSIGNED template"
             );
         }
@@ -103,7 +109,8 @@ TaskPro Team`,
 
     TASK_STATUS_UPDATED: (userName, taskTitle, newStatus) => {
         if (!userName || !taskTitle || !newStatus) {
-            throw new Error(
+            throw new ApiError(
+                400,
                 "Missing required parameters for TASK_STATUS_UPDATED template"
             );
         }
