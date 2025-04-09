@@ -4,21 +4,21 @@ import ApiError from "./ApiError.js";
 
 dotenv.config();
 
-const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: parseInt(process.env.EMAIL_PORT),
-    secure: false, // true for port 465, false for others like 587
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
-});
-
 export const sendEmail = async (to, subject, text, html) => {
     if (!to || !subject || !text || !html) {
         throw new ApiError(400, "Missing required fields");
     }
     try {
+        const transporter = nodemailer.createTransport({
+            host: process.env.EMAIL_HOST,
+            port: parseInt(process.env.EMAIL_PORT),
+            secure: false, // true for port 465, false for others like 587
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+
         const info = await transporter.sendMail({
             from: process.env.EMAIL_FROM,
             to,
