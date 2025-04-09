@@ -3,6 +3,12 @@ import ApiError from "../util/ApiError.js";
 import { TaskStatus } from "@prisma/client";
 import { getUsersWithPermission } from "./user.service.js";
 import { UserPermissions } from "../util/constant.js";
+import {
+    createInAppNotification,
+    dispatchNotification,
+    sendInAppNotification,
+} from "./notification.service.js";
+import inAppNotificationTemplate from "../util/template/inAppNotificationTemplate.js";
 
 export const createTask = async ({
     title,
@@ -10,6 +16,7 @@ export const createTask = async ({
     priority,
     deadline,
     assignerId,
+    assignerName,
     assigneeId,
 }) => {
     if (
@@ -33,6 +40,19 @@ export const createTask = async ({
                 assigneeId,
             },
         });
+
+        const notificationData = inAppNotificationTemplate.TASK_ASSIGNED(
+            newTask.title,
+            newTask.id,
+            assignerName
+        );
+        const notificationId = await createInAppNotification(
+            notificationData,
+            assigneeId
+        );
+        if (notificationId) {
+            await dispatchNotification(notificationId);
+        }
 
         return newTask;
     } catch (error) {

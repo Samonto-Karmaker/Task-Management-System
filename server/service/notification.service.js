@@ -59,7 +59,7 @@ export const getInAppNotifications = async (userId) => {
 };
 
 export const markNotificationsAsRead = async (notificationIds) => {
-    if (!notificationIds || notificationIds.length === 0) {
+    if (!notificationIds) {
         throw new ApiError(400, "Missing required fields");
     }
     try {
@@ -126,3 +126,30 @@ export const sendInAppNotification = async (
 export const createEmailNotification = async (content, sendTo) => {};
 
 export const sendEmailNotification = async (notificationId) => {};
+
+export const dispatchNotification = async (
+    notificationId,
+    type = NotificationType.IN_APP
+) => {
+    if (!notificationId) {
+        throw new ApiError(400, "Missing required fields");
+    }
+    try {
+        let notification;
+
+        // Implement a message queue or a similar mechanism to handle the dispatching of notifications
+
+        // Logic to dispatch the notification based on the type
+        if (type === NotificationType.IN_APP) {
+            notification = await sendInAppNotification(notificationId);
+        } else if (type === NotificationType.EMAIL) {
+            notification = await sendEmailNotification(notificationId);
+        }
+
+        return notification;
+    } catch (error) {
+        console.error(error);
+        if (error instanceof ApiError) throw error;
+        throw new ApiError(500, "Internal Server Error");
+    }
+};

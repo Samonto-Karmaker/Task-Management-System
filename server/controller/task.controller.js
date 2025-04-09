@@ -15,6 +15,7 @@ import { finalResErrorHandler } from "../util/finalResErrorHandler.js";
 export const createTaskController = async (req, res) => {
     const { title, description, priority, deadline, assigneeId } = req.body;
     const assignerId = req.user.id;
+    const assignerName = req.user.name;
     try {
         const newTask = await createTask({
             title,
@@ -22,6 +23,7 @@ export const createTaskController = async (req, res) => {
             priority,
             deadline,
             assignerId,
+            assignerName,
             assigneeId,
         });
 
