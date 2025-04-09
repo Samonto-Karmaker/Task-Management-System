@@ -1,6 +1,7 @@
 import ApiError from "../util/ApiError.js";
 import { prisma } from "../db/setupDB.js";
 import { NotificationType } from "@prisma/client";
+import { sendEmail } from "../util/sendEmail.js";
 
 export const createInAppNotification = async (content, sendTo) => {
     if (!content || !sendTo) {
@@ -158,7 +159,10 @@ export const createEmailNotification = async (content, sendTo) => {
     }
 };
 
-export const sendEmailNotification = async (notificationId, emailData = undefined) => {
+export const sendEmailNotification = async (
+    notificationId,
+    emailData = undefined
+) => {
     if (!notificationId) {
         throw new ApiError(400, "Missing required fields");
     }
@@ -172,11 +176,21 @@ export const sendEmailNotification = async (notificationId, emailData = undefine
         }
 
         // Logic to send the email notification (e.g., using an email service)
+        let emailInfo;
         if (emailData) {
             // Send email using the provided emailData
+            emailInfo = await sendEmail(
+                emailData.emailTo,
+                emailData.emailSubject,
+                emailData.emailText,
+                emailData.emailHtml
+            );
         }
 
-        return notification;
+        return {
+            notification,
+            emailInfo,
+        };
     } catch (error) {
         console.error(error);
         if (error instanceof ApiError) throw error;
@@ -202,7 +216,10 @@ export const dispatchNotification = async (
             notification = await sendInAppNotification(notificationId);
         } else if (type === NotificationType.EMAIL) {
             if (emailData) {
-                notification = await sendEmailNotification(notificationId, emailData);
+                notification = await sendEmailNotification(
+                    notificationId,
+                    emailData
+                );
             } else {
                 notification = await sendEmailNotification(notificationId);
             }
