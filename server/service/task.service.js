@@ -345,11 +345,34 @@ export const updateTaskStatus = async (taskId, userId, status) => {
             },
             select: {
                 id: true,
+                title: true,
                 status: true,
             },
         });
         if (!updatedTask) {
             throw new ApiError(404, "Task not found");
+        }
+
+        const notificationData = inAppNotificationTemplate.TASK_STATUS_UPDATED(
+            updatedTask.title,
+            updatedTask.id,
+            updatedTask.status
+        )
+        
+        const notificationIdAssignee = await createInAppNotification(
+            notificationData,
+            task.assigneeId
+        );
+        if (notificationIdAssignee) {
+            await dispatchNotification(notificationIdAssignee);
+        }
+
+        const notificationIdAssigner = await createInAppNotification(
+            notificationData,
+            task.assignerId
+        );
+        if (notificationIdAssigner) {
+            await dispatchNotification(notificationIdAssigner);
         }
 
         return updatedTask;
