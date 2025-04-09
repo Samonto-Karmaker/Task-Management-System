@@ -6,7 +6,6 @@ import { UserPermissions } from "../util/constant.js";
 import {
     createInAppNotification,
     dispatchNotification,
-    sendInAppNotification,
 } from "./notification.service.js";
 import inAppNotificationTemplate from "../util/template/inAppNotificationTemplate.js";
 
@@ -198,6 +197,8 @@ export const deleteTask = async (taskId, userId) => {
             select: {
                 id: true,
                 assignerId: true,
+                assigneeId: true,
+                title: true,
             },
         });
         if (!task) {
@@ -215,6 +216,27 @@ export const deleteTask = async (taskId, userId) => {
         await prisma.task.delete({
             where: { id: taskId },
         });
+
+        const notificationData = inAppNotificationTemplate.TASK_DELETED(
+            task.title,
+            task.id
+        );
+
+        const notificationIdAssignee = await createInAppNotification(
+            notificationData,
+            task.assigneeId
+        );
+        if (notificationIdAssignee) {
+            await dispatchNotification(notificationIdAssignee);
+        }
+
+        const notificationIdAssigner = await createInAppNotification(
+            notificationData,
+            task.assignerId
+        );
+        if (notificationIdAssigner) {
+            await dispatchNotification(notificationIdAssigner);
+        }
 
         return { message: "Task deleted successfully" };
     } catch (error) {
@@ -357,8 +379,8 @@ export const updateTaskStatus = async (taskId, userId, status) => {
             updatedTask.title,
             updatedTask.id,
             updatedTask.status
-        )
-        
+        );
+
         const notificationIdAssignee = await createInAppNotification(
             notificationData,
             task.assigneeId
