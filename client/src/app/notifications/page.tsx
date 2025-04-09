@@ -1,42 +1,61 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ApiResponse } from "@/types/api-response";
+import apiClient from "@/lib/apiClient";
+import { useUser } from "@/components/custom/hooks/useUser";
+import Loading from "@/components/custom/Loading";
+import Unauthorized from "@/components/custom/Unauthorized";
+import EmptyTable from "@/components/custom/EmptyTable";
 
-// Dummy data for notifications
-const dummyNotifications = [
-    {
-        id: "1",
-        content:
-            "You have been assigned a new task: Design the login page. Please complete it by the end of the week.",
-        createdAt: "2025-04-09T10:30:00Z",
-    },
-    {
-        id: "2",
-        content:
-            "The status of your task 'Update Dashboard UI' has been updated to 'In Progress'.",
-        createdAt: "2025-04-08T14:15:00Z",
-    },
-    {
-        id: "3",
-        content:
-            "Your task 'Fix Navbar Bug' has been reassigned to another team member.",
-        createdAt: "2025-04-07T09:00:00Z",
-    },
-    {
-        id: "4",
-        content:
-            "This is a very long notification content that exceeds the usual length. It contains detailed information about the task and additional instructions. Please make sure to read the full content to understand the requirements.",
-        createdAt: "2025-04-06T16:45:00Z",
-    },
-];
+interface Notification {
+    id: string;
+    content: string;
+    createdAt: string;
+    isRead?: boolean;
+}
 
 export default function NotificationsPage() {
+    const [notifications, setNotifications] = useState<Notification[]>([]);
     const [expandedNotifications, setExpandedNotifications] = useState<
         string[]
     >([]);
+    const [loading, setLoading] = useState(true);
+
+    const { user } = useUser();
+
+    useEffect(() => {
+        const fetchNotifications = async () => {
+            try {
+                const response: ApiResponse = await apiClient.get(
+                    "/notification/in-app-notifications"
+                );
+                if (response.success) {
+                    setNotifications(response.data);
+                } else {
+                    console.error(
+                        "Failed to fetch notifications:",
+                        response.message
+                    );
+                    alert(
+                        "Failed to fetch notifications. Please try again later."
+                    );
+                }
+            } catch (error) {
+                console.error("Error fetching notifications:", error);
+                alert("An error occurred while fetching notifications.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (user) {
+            fetchNotifications();
+        }
+    }, [user]);
 
     const toggleReadMore = (id: string) => {
         setExpandedNotifications((prev) =>
@@ -46,11 +65,15 @@ export default function NotificationsPage() {
         );
     };
 
+    if (!user) return <Unauthorized />;
+    if (loading) return <Loading />;
+    if (notifications.length === 0) return <EmptyTable />;
+
     return (
         <div className="max-w-3xl mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Notifications</h1>
             <div className="space-y-4">
-                {dummyNotifications.map((notification) => {
+                {notifications.map((notification) => {
                     const isExpanded = expandedNotifications.includes(
                         notification.id
                     );
