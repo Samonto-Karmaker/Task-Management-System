@@ -1,5 +1,6 @@
 import ApiError from "../util/ApiError.js";
 import { prisma } from "../db/setupDB.js";
+import { NotificationType } from "@prisma/client";
 
 export const createInAppNotification = async (content, sendTo) => {
     if (!content || !sendTo) {
@@ -29,7 +30,28 @@ export const createInAppNotification = async (content, sendTo) => {
     }
 };
 
-export const getInAppNotifications = async (userId) => {};
+export const getInAppNotifications = async (userId) => {
+    if (!userId) {
+        throw new ApiError(400, "Missing required fields");
+    }
+    try {
+        const notifications = await prisma.notification.findMany({
+            where: { sendToId: userId, type: NotificationType.IN_APP },
+            select: {
+                id: true,
+                content: true,
+                createdAt: true,
+                isRead: true,
+            },
+            orderBy: { createdAt: "desc" },
+        });
+        return notifications;
+    } catch (error) {
+        console.error(error);
+        if (error instanceof ApiError) throw error;
+        throw new ApiError(500, "Internal Server Error");
+    }
+};
 
 export const markNotificationsAsRead = async (notificationIds) => {};
 
