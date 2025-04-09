@@ -4,12 +4,7 @@ import bcrypt from "bcrypt";
 import { getRolePermissions } from "./rolePermission.service.js";
 import { UserPermissions } from "../util/constant.js";
 import { EmailTemplates } from "../util/template/emailTemplate.js";
-import {
-    createEmailNotification,
-    dispatchNotification,
-    notifyEmail,
-} from "./notification.service.js";
-import { NotificationType } from "@prisma/client";
+import { notifyEmail } from "./notification.service.js";
 
 export const createUser = async ({ name, email, password, roleId }) => {
     if (!name || !email || !password || !roleId) {
@@ -31,6 +26,18 @@ export const createUser = async ({ name, email, password, roleId }) => {
         const newUser = await prisma.user.create({
             data: { name, email, password: hashedPassword, roleId },
         });
+
+        // Send email notification
+        if (newUser) {
+            const emailTemplate = EmailTemplates.USER_CREATED(
+                newUser.name,
+                newUser.email,
+                password
+            );
+            notifyEmail(newUser.id, emailTemplate).catch((error) => {
+                console.error("Failed to send email:", error);
+            });
+        }
 
         return newUser;
     } catch (error) {
