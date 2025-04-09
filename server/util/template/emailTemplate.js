@@ -1,4 +1,4 @@
-import ApiError from "../ApiError";
+import ApiError from "../ApiError.js";
 
 export const EmailTemplates = {
     USER_CREATED: (userName, email, tempPassword) => {
@@ -57,6 +57,29 @@ TaskPro Team`,
                 <p>Hi <strong>${userName}</strong>,</p>
                 <p>Your account has been temporarily blocked by an administrator. You will not be able to access the system until it is unblocked.</p>
                 <p>If you believe this was a mistake, please contact support.</p>
+                <p>Regards,<br>TaskPro Team</p>
+            `,
+        };
+    },
+
+    USER_UNBLOCKED: (userName) => {
+        if (!userName) {
+            throw new ApiError(
+                400,
+                "Missing required parameter for USER_BLOCKED template"
+            );
+        }
+        return {
+            subject: `Your account has been blocked`,
+            body: `Hi ${userName},
+  
+Your account has been unblocked by an administrator. You can now access the system.
+
+Regards,  
+TaskPro Team`,
+            html: `
+                <p>Hi <strong>${userName}</strong>,</p>
+                <p>Your account has been unblocked by an administrator. You can now access the system.</p>
                 <p>Regards,<br>TaskPro Team</p>
             `,
         };

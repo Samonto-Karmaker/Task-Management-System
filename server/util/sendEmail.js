@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
-import ApiError from "./ApiError";
+import ApiError from "./ApiError.js";
 
 dotenv.config();
 
@@ -15,6 +15,9 @@ const transporter = nodemailer.createTransport({
 });
 
 export const sendEmail = async (to, subject, text, html) => {
+    if (!to || !subject || !text || !html) {
+        throw new ApiError(400, "Missing required fields");
+    }
     try {
         const info = await transporter.sendMail({
             from: process.env.EMAIL_FROM,

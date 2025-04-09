@@ -3,6 +3,12 @@ import { prisma } from "../db/setupDB.js";
 import bcrypt from "bcrypt";
 import { getRolePermissions } from "./rolePermission.service.js";
 import { UserPermissions } from "../util/constant.js";
+import { EmailTemplates } from "../util/template/emailTemplate.js";
+import {
+    createEmailNotification,
+    dispatchNotification,
+} from "./notification.service.js";
+import { NotificationType } from "@prisma/client";
 
 export const createUser = async ({ name, email, password, roleId }) => {
     if (!name || !email || !password || !roleId) {
@@ -149,6 +155,51 @@ export const toggleBlockUser = async (userId) => {
                 isBlocked: true,
             },
         });
+
+        if (updatedUser.isBlocked) {
+            const emailTemplate = EmailTemplates.USER_BLOCKED(updatedUser.name);
+            const metadata = await createEmailNotification(
+                emailTemplate,
+                userId
+            );
+
+            const emailData = {
+                subject: metadata.emailSubject,
+                to: metadata.emailTo,
+                text: metadata.emailText,
+                html: metadata.emailHtml
+            }
+            console.log("Metadata:", metadata);
+            const { notification, emailInfo } = dispatchNotification(
+                metadata.notificationId,
+                NotificationType.EMAIL,
+                emailData
+            );
+
+            console.log("Email sent:", emailInfo);
+        } else {
+            const emailTemplate = EmailTemplates.USER_UNBLOCKED(updatedUser.name);
+            const metadata = await createEmailNotification(
+                emailTemplate,
+                userId
+            );
+
+            const emailData = {
+                subject: metadata.emailSubject,
+                to: metadata.emailTo,
+                text: metadata.emailText,
+                html: metadata.emailHtml
+            }
+            console.log("Metadata:", metadata);
+            const { notification, emailInfo } = dispatchNotification(
+                metadata.notificationId,
+                NotificationType.EMAIL,
+                emailData
+            );
+
+            console.log("Email sent:", emailInfo);
+        }
+
         return updatedUser;
     } catch (error) {
         console.error(error);

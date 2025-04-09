@@ -139,7 +139,7 @@ export const createEmailNotification = async (content, sendTo) => {
 
         const notification = await prisma.notification.create({
             data: {
-                content,
+                content: content.body,
                 sendToId: sendTo,
                 type: NotificationType.EMAIL,
             },
@@ -180,10 +180,10 @@ export const sendEmailNotification = async (
         if (emailData) {
             // Send email using the provided emailData
             emailInfo = await sendEmail(
-                emailData.emailTo,
-                emailData.emailSubject,
-                emailData.emailText,
-                emailData.emailHtml
+                emailData.to,
+                emailData.subject,
+                emailData.text,
+                emailData.html
             );
         }
 
