@@ -22,6 +22,17 @@ Welcome to the team once again!
 
 Thanks,  
 TaskPro Team`,
+            html: `
+                <p>Hi <strong>${userName}</strong>,</p>
+                <p>Your account has been created successfully.</p>
+                <p><strong>Login Credentials:</strong></p>
+                <ul>
+                    <li>Email: ${email}</li>
+                    <li>Password: ${tempPassword}</li>
+                </ul>
+                <p>Welcome to the team once again!</p>
+                <p>Thanks,<br>TaskPro Team</p>
+            `,
         };
     },
 
@@ -42,6 +53,12 @@ If you believe this was a mistake, please contact support.
 
 Regards,  
 TaskPro Team`,
+            html: `
+                <p>Hi <strong>${userName}</strong>,</p>
+                <p>Your account has been temporarily blocked by an administrator. You will not be able to access the system until it is unblocked.</p>
+                <p>If you believe this was a mistake, please contact support.</p>
+                <p>Regards,<br>TaskPro Team</p>
+            `,
         };
     },
 
@@ -84,6 +101,19 @@ Please check your dashboard to get started.
 
 Best,  
 TaskPro Team`,
+            html: `
+                <p>Hi <strong>${userName}</strong>,</p>
+                <p>You have been assigned a new task:</p>
+                <ul>
+                    <li><strong>Title:</strong> ${task.title}</li>
+                    <li><strong>Description:</strong> ${task.description}</li>
+                    <li><strong>Deadline:</strong> ${formattedDeadline}</li>
+                    <li><strong>Priority:</strong> ${task.priority}</li>
+                    <li><strong>Assigner:</strong> ${task.assigner.name}</li>
+                </ul>
+                <p>Please check your dashboard to get started.</p>
+                <p>Best,<br>TaskPro Team</p>
+            `,
         };
     },
 
@@ -104,6 +134,12 @@ If you have any questions regarding this change, please contact ${assigner}.
 
 Regards,  
 TaskPro Team`,
+            html: `
+                <p>Hi <strong>${userName}</strong>,</p>
+                <p>The task "<strong>${taskTitle}</strong>" which was previously assigned to you has been reassigned to <strong>${newAssignee}</strong>.</p>
+                <p>If you have any questions regarding this change, please contact <strong>${assigner}</strong>.</p>
+                <p>Regards,<br>TaskPro Team</p>
+            `,
         };
     },
 
@@ -124,6 +160,12 @@ Check your dashboard for more details.
 
 Best,  
 TaskPro Team`,
+            html: `
+                <p>Hi <strong>${userName}</strong>,</p>
+                <p>The status of the task "<strong>${taskTitle}</strong>" has been updated to "<strong>${newStatus}</strong>".</p>
+                <p>Check your dashboard for more details.</p>
+                <p>Best,<br>TaskPro Team</p>
+            `,
         };
     },
 };
