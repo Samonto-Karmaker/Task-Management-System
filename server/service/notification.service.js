@@ -232,3 +232,22 @@ export const dispatchNotification = async (
         throw new ApiError(500, "Internal Server Error");
     }
 };
+
+export const notifyEmail = async (sendTo, emailTemplate) => {
+    const metadata = await createEmailNotification(
+        emailTemplate,
+        sendTo
+    );
+
+    const emailData = {
+        subject: metadata.emailSubject,
+        to: metadata.emailTo,
+        text: metadata.emailText,
+        html: metadata.emailHtml
+    }
+    await dispatchNotification(
+        metadata.notificationId,
+        NotificationType.EMAIL,
+        emailData
+    );
+};

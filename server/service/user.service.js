@@ -7,6 +7,7 @@ import { EmailTemplates } from "../util/template/emailTemplate.js";
 import {
     createEmailNotification,
     dispatchNotification,
+    notifyEmail,
 } from "./notification.service.js";
 import { NotificationType } from "@prisma/client";
 
@@ -158,46 +159,10 @@ export const toggleBlockUser = async (userId) => {
 
         if (updatedUser.isBlocked) {
             const emailTemplate = EmailTemplates.USER_BLOCKED(updatedUser.name);
-            const metadata = await createEmailNotification(
-                emailTemplate,
-                userId
-            );
-
-            const emailData = {
-                subject: metadata.emailSubject,
-                to: metadata.emailTo,
-                text: metadata.emailText,
-                html: metadata.emailHtml
-            }
-            console.log("Metadata:", metadata);
-            const { notification, emailInfo } = dispatchNotification(
-                metadata.notificationId,
-                NotificationType.EMAIL,
-                emailData
-            );
-
-            console.log("Email sent:", emailInfo);
+            notifyEmail(userId, emailTemplate)
         } else {
             const emailTemplate = EmailTemplates.USER_UNBLOCKED(updatedUser.name);
-            const metadata = await createEmailNotification(
-                emailTemplate,
-                userId
-            );
-
-            const emailData = {
-                subject: metadata.emailSubject,
-                to: metadata.emailTo,
-                text: metadata.emailText,
-                html: metadata.emailHtml
-            }
-            console.log("Metadata:", metadata);
-            const { notification, emailInfo } = dispatchNotification(
-                metadata.notificationId,
-                NotificationType.EMAIL,
-                emailData
-            );
-
-            console.log("Email sent:", emailInfo);
+            notifyEmail(userId, emailTemplate)
         }
 
         return updatedUser;
