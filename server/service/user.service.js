@@ -157,13 +157,15 @@ export const toggleBlockUser = async (userId) => {
             },
         });
 
+        let emailTemplate;
         if (updatedUser.isBlocked) {
-            const emailTemplate = EmailTemplates.USER_BLOCKED(updatedUser.name);
-            notifyEmail(userId, emailTemplate)
+            emailTemplate = EmailTemplates.USER_BLOCKED(updatedUser.name);
         } else {
-            const emailTemplate = EmailTemplates.USER_UNBLOCKED(updatedUser.name);
-            notifyEmail(userId, emailTemplate)
+            emailTemplate = EmailTemplates.USER_UNBLOCKED(updatedUser.name);
         }
+        notifyEmail(userId, emailTemplate).catch((error) => {
+            console.error("Failed to send email:", error);
+        });
 
         return updatedUser;
     } catch (error) {
