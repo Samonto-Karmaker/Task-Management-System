@@ -3,7 +3,7 @@ import { checkAuth } from "../middleware/common/authorization.middleware.js";
 import {
     getInAppNotificationsController,
     getUnreadNotificationsCountController,
-} from "../controller/notification.controller";
+} from "../controller/notification.controller.js";
 
 const notificationRouter = Router();
 notificationRouter.use(checkAuth);
