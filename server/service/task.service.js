@@ -4,10 +4,11 @@ import { TaskStatus } from "@prisma/client";
 import { getUsersWithPermission } from "./user.service.js";
 import { UserPermissions } from "../util/constant.js";
 import {
-    createInAppNotification,
-    dispatchNotification,
+    notifyEmail,
+    notifyInApp,
 } from "./notification.service.js";
 import inAppNotificationTemplate from "../util/template/inAppNotificationTemplate.js";
+import { EmailTemplates } from "../util/template/emailTemplate.js";
 
 export const createTask = async ({
     title,
@@ -39,19 +40,24 @@ export const createTask = async ({
                 assigneeId,
             },
         });
+        const assigneeName = await prisma.user.findUnique({
+            where: { id: assigneeId },
+            select: { name: true },
+        });
 
         const notificationData = inAppNotificationTemplate.TASK_ASSIGNED(
             newTask.title,
             newTask.id,
             assignerName
         );
-        const notificationId = await createInAppNotification(
-            notificationData,
-            assigneeId
-        );
-        if (notificationId) {
-            await dispatchNotification(notificationId);
-        }
+        notifyInApp(assigneeId, notificationData).catch((error) => {
+            console.error("Failed to send notification:", error);
+        });
+
+        const emailData = EmailTemplates.TASK_ASSIGNED(assigneeName, newTask);
+        notifyEmail(assigneeId, emailData).catch((error) => {
+            console.error("Failed to send email:", error);
+        });
 
         return newTask;
     } catch (error) {
@@ -221,22 +227,12 @@ export const deleteTask = async (taskId, userId) => {
             task.title,
             task.id
         );
-
-        const notificationIdAssignee = await createInAppNotification(
-            notificationData,
-            task.assigneeId
-        );
-        if (notificationIdAssignee) {
-            await dispatchNotification(notificationIdAssignee);
-        }
-
-        const notificationIdAssigner = await createInAppNotification(
-            notificationData,
-            task.assignerId
-        );
-        if (notificationIdAssigner) {
-            await dispatchNotification(notificationIdAssigner);
-        }
+        notifyInApp(task.assigneeId, notificationData).catch((error) => {
+            console.error("Failed to send notification:", error);
+        });
+        notifyInApp(task.assignerId, notificationData).catch((error) => {
+            console.error("Failed to send notification:", error);
+        });
 
         return { message: "Task deleted successfully" };
     } catch (error) {
@@ -369,6 +365,19 @@ export const updateTaskStatus = async (taskId, userId, status) => {
                 id: true,
                 title: true,
                 status: true,
+                assigner: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
+                assignee: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
+                updatedAt: true,
             },
         });
         if (!updatedTask) {
@@ -381,21 +390,29 @@ export const updateTaskStatus = async (taskId, userId, status) => {
             updatedTask.status
         );
 
-        const notificationIdAssignee = await createInAppNotification(
-            notificationData,
-            task.assigneeId
-        );
-        if (notificationIdAssignee) {
-            await dispatchNotification(notificationIdAssignee);
-        }
+        notifyInApp(task.assigneeId, notificationData).catch((error) => {
+            console.error("Failed to send notification:", error);
+        });
+        notifyInApp(task.assignerId, notificationData).catch((error) => {
+            console.error("Failed to send notification:", error);
+        });
 
-        const notificationIdAssigner = await createInAppNotification(
-            notificationData,
-            task.assignerId
+        const emailDataAssignee = EmailTemplates.TASK_STATUS_UPDATED(
+            updatedTask.assignee.name,
+            updatedTask.title,
+            updatedTask.status
         );
-        if (notificationIdAssigner) {
-            await dispatchNotification(notificationIdAssigner);
-        }
+        const emailDataAssigner = EmailTemplates.TASK_STATUS_UPDATED(
+            updatedTask.assigner.name,
+            updatedTask.title,
+            updatedTask.status
+        );
+        notifyEmail(task.assigneeId, emailDataAssignee).catch((error) => {
+            console.error("Failed to send email:", error);
+        });
+        notifyEmail(task.assignerId, emailDataAssigner).catch((error) => {
+            console.error("Failed to send email:", error);
+        });
 
         return updatedTask;
     } catch (error) {

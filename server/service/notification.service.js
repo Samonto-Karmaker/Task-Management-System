@@ -251,3 +251,8 @@ export const notifyEmail = async (sendTo, emailTemplate) => {
         emailData
     );
 };
+
+export const notifyInApp = async (sendTo, content) => {
+    const notificationId = await createInAppNotification(content, sendTo);
+    await dispatchNotification(notificationId);
+}

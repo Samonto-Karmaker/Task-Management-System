@@ -92,8 +92,7 @@ TaskPro Team`,
             !task.title ||
             !task.description ||
             !task.deadline ||
-            !task.priority ||
-            !task.assigner
+            !task.priority
         ) {
             throw new ApiError(
                 400,
@@ -118,7 +117,6 @@ Title: ${task.title}
 Description: ${task.description}  
 Deadline: ${formattedDeadline}  
 Priority: ${task.priority}  
-Assigner: ${task.assigner.name}
 
 Please check your dashboard to get started.
 
