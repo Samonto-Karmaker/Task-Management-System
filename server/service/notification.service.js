@@ -45,7 +45,9 @@ export const getInAppNotifications = async (userId) => {
             orderBy: { createdAt: "desc" },
         });
 
-        const notificationIds = notifications.map((notification) => notification.id);
+        const notificationIds = notifications.map(
+            (notification) => notification.id
+        );
         markNotificationsAsRead(notificationIds);
 
         return notifications;
@@ -76,7 +78,26 @@ export const markNotificationsAsRead = async (notificationIds) => {
     }
 };
 
-export const sendInAppNotification = async (notificationId, isRealTime = false) => {
+export const getUnreadNotificationsCount = async (userId) => {
+    if (!userId) {
+        throw new ApiError(400, "Missing required fields");
+    }
+    try {
+        const count = await prisma.notification.count({
+            where: { sendToId: userId, isRead: false },
+        });
+        return count;
+    } catch (error) {
+        console.error(error);
+        if (error instanceof ApiError) throw error;
+        throw new ApiError(500, "Internal Server Error");
+    }
+};
+
+export const sendInAppNotification = async (
+    notificationId,
+    isRealTime = false
+) => {
     if (!notificationId) {
         throw new ApiError(400, "Missing required fields");
     }
