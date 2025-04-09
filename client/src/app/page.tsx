@@ -9,7 +9,7 @@ export default function Home() {
     return (
         <main className="container mx-auto px-4 py-8">
             {user ? (
-                <Dashboard user={user} />
+                <Dashboard />
             ) : (
                 <>
                     <h1 className="text-3xl font-bold mb-8">
