@@ -18,10 +18,6 @@ services:
       dockerfile: Dockerfile.server  # Ensure this matches the Dockerfile in the backend directory
     ports:
       - "5000:5000"  # Expose backend on port 5000
-    environment:
-      - CORS_ORIGIN=http://localhost:3000  # Allow frontend to access backend
-      - PORT=5000  # Port for backend service
-      - NODE_ENV="development"
     depends_on:
       - postgres
     env_file:
@@ -31,9 +27,9 @@ services:
   postgres:
     image: postgres:13-alpine
     environment:
-      POSTGRES_USER: ${DB_USER}  # Ensure DB_USER is defined in .env file
-      POSTGRES_PASSWORD: ${DB_PASSWORD}  # Ensure DB_PASSWORD is defined in .env file
-      POSTGRES_DB: ${DB_NAME}  # Ensure DB_NAME is defined in .env file
+      POSTGRES_USER: ${DB_USER}  # Ensure these variables are set in the .env file
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:

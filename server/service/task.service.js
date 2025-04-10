@@ -1,6 +1,6 @@
 import { prisma } from "../db/setupDB.js";
 import ApiError from "../util/ApiError.js";
-import { TaskStatus } from "@prisma/client";
+import { TaskStatus } from "../db/setupDB.js";
 import { getUsersWithPermission } from "./user.service.js";
 import { UserPermissions } from "../util/constant.js";
 import {

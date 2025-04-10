@@ -2,7 +2,7 @@ import { check, validationResult } from "express-validator";
 import ApiError from "../../util/ApiError.js";
 import { prisma } from "../../db/setupDB.js";
 import ApiResponse from "../../util/ApiResponse.js";
-import { Priority } from "@prisma/client";
+import { Priority } from "../../db/setupDB.js";
 import { UserPermissions } from "../../util/constant.js";
 import { isFieldRequired } from "../../util/isFieldRequire.js";
 

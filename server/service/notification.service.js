@@ -1,6 +1,6 @@
 import ApiError from "../util/ApiError.js";
 import { prisma } from "../db/setupDB.js";
-import { NotificationType } from "@prisma/client";
+import { NotificationType } from "../db/setupDB.js";
 import { sendEmail } from "../util/sendEmail.js";
 
 export const createInAppNotification = async (content, sendTo) => {

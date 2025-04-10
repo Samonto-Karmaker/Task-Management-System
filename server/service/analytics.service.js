@@ -1,6 +1,6 @@
 import ApiError from "../util/ApiError.js";
 import { prisma } from "../db/setupDB.js";
-import { TaskStatus } from "@prisma/client";
+import { TaskStatus } from "../db/setupDB.js";
 
 export const getAssignedTaskStatusStatsByUser = async (userId) => {
     if (!userId) {
