@@ -2,6 +2,7 @@ import ApiError from "../util/ApiError.js";
 import { prisma } from "../db/setupDB.js";
 import { NotificationType } from "../db/setupDB.js";
 import { sendEmail } from "../util/sendEmail.js";
+import { notificationQueue } from "../util/message-queue/queue.js";
 
 export const createInAppNotification = async (content, sendTo) => {
     if (!content || !sendTo) {
@@ -207,25 +208,12 @@ export const dispatchNotification = async (
         throw new ApiError(400, "Missing required fields");
     }
     try {
-        let notification;
-
-        // Implement a message queue or a similar mechanism to handle the dispatching of notifications
-
-        // Logic to dispatch the notification based on the type
-        if (type === NotificationType.IN_APP) {
-            notification = await sendInAppNotification(notificationId);
-        } else if (type === NotificationType.EMAIL) {
-            if (emailData) {
-                notification = await sendEmailNotification(
-                    notificationId,
-                    emailData
-                );
-            } else {
-                notification = await sendEmailNotification(notificationId);
-            }
-        }
-
-        return notification;
+        await notificationQueue.add("sendNotification", {
+            notificationId,
+            type,
+            emailData,
+        });
+        return true;
     } catch (error) {
         console.error(error);
         if (error instanceof ApiError) throw error;
@@ -234,25 +222,34 @@ export const dispatchNotification = async (
 };
 
 export const notifyEmail = async (sendTo, emailTemplate) => {
-    const metadata = await createEmailNotification(
-        emailTemplate,
-        sendTo
-    );
+    const metadata = await createEmailNotification(emailTemplate, sendTo);
 
     const emailData = {
         subject: metadata.emailSubject,
         to: metadata.emailTo,
         text: metadata.emailText,
-        html: metadata.emailHtml
-    }
-    await dispatchNotification(
+        html: metadata.emailHtml,
+    };
+    const isEnqueued = await dispatchNotification(
         metadata.notificationId,
         NotificationType.EMAIL,
         emailData
     );
+
+    if (!isEnqueued) {
+        throw new ApiError(500, "Failed to enqueue email notification");
+    } else {
+        console.log("Email notification enqueued successfully");
+    }
 };
 
 export const notifyInApp = async (sendTo, content) => {
     const notificationId = await createInAppNotification(content, sendTo);
-    await dispatchNotification(notificationId);
-}
+    const isEnqueued = await dispatchNotification(notificationId);
+
+    if (!isEnqueued) {
+        throw new ApiError(500, "Failed to enqueue email notification");
+    } else {
+        console.log("In-App notification enqueued successfully");
+    }
+};

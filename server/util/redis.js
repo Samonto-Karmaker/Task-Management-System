@@ -4,7 +4,7 @@ import ApiError from "./ApiError.js";
 
 dotenv.config();
 
-const redis = new Redis({
+export const redis = new Redis({
     host: process.env.REDIS_HOST || "localhost",
     port: parseInt(process.env.REDIS_PORT) || 6379,
     retryStrategy: function(times) {
@@ -15,6 +15,7 @@ const redis = new Redis({
       }
 })
 
+// Just for testing redis connection
 export const setNotificationInRedis = async (id, content) => {
     try {
         if (!id || !content) {
