@@ -44,7 +44,7 @@ userRouter.patch(
     toggleBlockUserController
 );
 userRouter.get(
-    "/:id",
+    "/user/:id",
     checkAuth,
     checkRole(UserPermissions.VIEW_USER),
     getUserByIdController

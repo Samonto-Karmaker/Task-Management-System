@@ -35,6 +35,7 @@ export default function AllTasksDashboardPage() {
     const canCreateTask = checkPermission(user, UserPermissions.CREATE_TASK);
     const canViewAssignedTasks = checkPermission(user, UserPermissions.VIEW_ASSIGNED_TASK);
     const canViewCreatedTasks = checkPermission(user, UserPermissions.VIEW_TASK_ASSIGNEES);
+    const canViewUser = checkPermission(user, UserPermissions.VIEW_USER);
 
     useEffect(() => {
         const fetchAllTasks = async () => {
@@ -187,10 +188,28 @@ export default function AllTasksDashboardPage() {
                                     />
                                 </TableCell>
                                 <TableCell className="p-3">
-                                    {task.assigner?.name}
+                                    {canViewUser ? (
+                                        <Link
+                                            href={`/users/${task.assigner?.id}`}
+                                            className="font-bold text-blue-500 hover:text-blue-800"
+                                        >
+                                            {task.assigner?.name}
+                                        </Link>
+                                    ) : (
+                                        task.assigner?.name
+                                    )}
                                 </TableCell>
                                 <TableCell className="p-3">
-                                    {task.assignee?.name}
+                                    {canViewUser ? (
+                                        <Link
+                                            href={`/users/${task.assignee?.id}`}
+                                            className="font-bold text-blue-500 hover:text-blue-800"
+                                        >
+                                            {task.assignee?.name}
+                                        </Link>
+                                    ) : (
+                                        task.assignee?.name
+                                    )}
                                 </TableCell>
                                 {canUpdateTask && (
                                     <TableCell className="p-3">

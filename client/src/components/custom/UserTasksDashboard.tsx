@@ -29,9 +29,13 @@ export default function UserTasksDashboardPage({
     isAssigneeView = true,
 }: UserTasksDashboardProps) {
     const { user } = useUser();
-    const canChangeStatus = checkPermission(user, UserPermissions.UPDATE_TASK_STATUS);
+    const canChangeStatus = checkPermission(
+        user,
+        UserPermissions.UPDATE_TASK_STATUS
+    );
     const canUpdateTask = checkPermission(user, UserPermissions.UPDATE_TASK);
     const canDeleteTask = checkPermission(user, UserPermissions.DELETE_TASK);
+    const canViewUser = checkPermission(user, UserPermissions.VIEW_USER);
 
     return (
         <div className="flex flex-col gap-4">
@@ -126,9 +130,26 @@ export default function UserTasksDashboardPage({
                                     />
                                 </TableCell>
                                 <TableCell className="p-3">
-                                    {isAssigneeView
-                                        ? task.assigner?.name
-                                        : task.assignee?.name}
+                                    {canViewUser ? (
+                                        <Link
+                                            href={`/users/${
+                                                isAssigneeView
+                                                    ? task.assigner?.id
+                                                    : task.assignee?.id
+                                            }`}
+                                            className="font-bold text-blue-500 hover:text-blue-800"
+                                        >
+                                            {isAssigneeView
+                                                ? task.assigner?.name || "N/A"
+                                                : task.assignee?.name || "N/A"}
+                                        </Link>
+                                    ) : (
+                                        <span className="text-gray-500">
+                                            {isAssigneeView
+                                                ? task.assignee?.name || "N/A"
+                                                : task.assigner?.name || "N/A"}
+                                        </span>
+                                    )}
                                 </TableCell>
                                 {canUpdateTask && (
                                     <TableCell className="p-3">

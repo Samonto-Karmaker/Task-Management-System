@@ -112,7 +112,21 @@ const TaskList = ({ tasks, label }: TaskListProps) => (
     </Card>
 );
 
-export default function Dashboard() {
+export interface OtherUser {
+    id: string;
+    name: string;
+    email: string;
+    role: {
+        id: string;
+        name: string;
+    };
+}
+
+interface DashboardProps {
+    otherUser?: OtherUser;
+}
+
+export default function Dashboard({ otherUser }: DashboardProps) {
     const [assignedTasks, setAssignedTasks] = useState<TaskStatusStats>(
         dummyPerformanceData.assignedTasks
     );
@@ -133,10 +147,11 @@ export default function Dashboard() {
 
     useEffect(() => {
         const fetchData = async () => {
+            const id = otherUser?.id || user?.id;
             try {
                 // Fetch analytics data from the backend
                 const response: ApiResponse = await apiClient.get(
-                    `/analytics/${user?.id}`
+                    `/analytics/${id}`
                 );
 
                 if (response.success) {
@@ -164,10 +179,10 @@ export default function Dashboard() {
             }
         };
 
-        if (user?.id) {
+        if (user?.id || otherUser?.id) {
             fetchData();
         }
-    }, [user]);
+    }, [user, otherUser]);
 
     // Define the type for the `data` parameter in `renderStatusBars`
     const renderStatusBars = (data: TaskStatusStats) => {
@@ -192,10 +207,11 @@ export default function Dashboard() {
                 <CardContent className="w-full p-4">
                     <h2>
                         <div className="text-lg font-semibold mb-2">
-                            {user?.name} : {user?.permissionInfo?.role}
+                            {otherUser?.name || user?.name}:{" "}
+                            {otherUser?.role.name || user?.permissionInfo.role}
                         </div>
                         <div className="text-sm text-muted-foreground">
-                            {user?.email}
+                            {otherUser?.email || user?.email}
                         </div>
                     </h2>
                 </CardContent>
