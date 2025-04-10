@@ -45,19 +45,21 @@ export const createTask = async ({
             select: { name: true },
         });
 
-        const notificationData = inAppNotificationTemplate.TASK_ASSIGNED(
-            newTask.title,
-            newTask.id,
-            assignerName
-        );
-        notifyInApp(assigneeId, notificationData).catch((error) => {
-            console.error("Failed to send notification:", error);
-        });
-
-        const emailData = EmailTemplates.TASK_ASSIGNED(assigneeName, newTask);
-        notifyEmail(assigneeId, emailData).catch((error) => {
-            console.error("Failed to send email:", error);
-        });
+        if(newTask) {
+            const notificationData = inAppNotificationTemplate.TASK_ASSIGNED(
+                newTask.title,
+                newTask.id,
+                assignerName
+            );
+            notifyInApp(assigneeId, notificationData).catch((error) => {
+                console.error("Failed to send notification:", error);
+            });
+    
+            const emailData = EmailTemplates.TASK_ASSIGNED(assigneeName, newTask);
+            notifyEmail(assigneeId, emailData).catch((error) => {
+                console.error("Failed to send email:", error);
+            });
+        }
 
         return newTask;
     } catch (error) {
