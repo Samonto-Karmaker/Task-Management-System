@@ -7,13 +7,14 @@ dotenv.config();
 export const redis = new Redis({
     host: process.env.REDIS_HOST || "localhost",
     port: parseInt(process.env.REDIS_PORT) || 6379,
-    retryStrategy: function(times) {
+    retryStrategy: function (times) {
         if (times > 5) {
-          return undefined; // Stop retrying after 5 attempts
+            return undefined; // Stop retrying after 5 attempts
         }
         return Math.min(times * 100, 3000); // Exponentially back off retries
-      }
-})
+    },
+    maxRetriesPerRequest: null, // No limit on retries per request
+});
 
 // Just for testing redis connection
 export const setNotificationInRedis = async (id, content) => {
@@ -29,7 +30,7 @@ export const setNotificationInRedis = async (id, content) => {
         console.error("Error setting notification in Redis:", error);
         throw new ApiError(500, "Failed to set notification in Redis");
     }
-}
+};
 
 export const getNotificationFromRedis = async (id) => {
     try {
