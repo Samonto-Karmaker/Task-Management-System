@@ -55,7 +55,7 @@ export const createTask = async ({
                 console.error("Failed to send notification:", error);
             });
     
-            const emailData = EmailTemplates.TASK_ASSIGNED(assigneeName, newTask);
+            const emailData = EmailTemplates.TASK_ASSIGNED(assigneeName.name, newTask);
             notifyEmail(assigneeId, emailData).catch((error) => {
                 console.error("Failed to send email:", error);
             });
