@@ -188,6 +188,18 @@ export default function Dashboard() {
 
     return (
         <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 lg:grid-cols-3">
+            <Card className="col-span-1 md:col-span-2 lg:col-span-3">
+                <CardContent className="w-full p-4">
+                    <h2>
+                        <div className="text-lg font-semibold mb-2">
+                            {user?.name} : {user?.permissionInfo?.role}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                            {user?.email}
+                        </div>
+                    </h2>
+                </CardContent>
+            </Card>
             <StatCard
                 title="Tasks In Hand"
                 value={workload.taskInHand}
