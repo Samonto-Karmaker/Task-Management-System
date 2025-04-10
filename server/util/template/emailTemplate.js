@@ -130,7 +130,6 @@ TaskPro Team`,
                     <li><strong>Description:</strong> ${task.description}</li>
                     <li><strong>Deadline:</strong> ${formattedDeadline}</li>
                     <li><strong>Priority:</strong> ${task.priority}</li>
-                    <li><strong>Assigner:</strong> ${task.assigner.name}</li>
                 </ul>
                 <p>Please check your dashboard to get started.</p>
                 <p>Best,<br>TaskPro Team</p>
