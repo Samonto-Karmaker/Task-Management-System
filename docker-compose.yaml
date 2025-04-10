@@ -20,6 +20,7 @@ services:
       - "5000:5000"  # Expose backend on port 5000
     depends_on:
       - postgres
+      - redis  # Ensure Redis is started before the backend
     env_file:
       - ./server/.env  # Path to the backend .env file
 
@@ -37,5 +38,15 @@ services:
     env_file:
       - ./server/.env  # Path to the backend .env file
 
+    # Redis service
+  redis:
+    image: redis:alpine  # Use Redis Alpine version for a lightweight Redis container
+    ports:
+      - "6379:6379"  # Expose Redis on port 6379
+    volumes:
+      - redis_data:/data  # Optionally, store Redis data in a volume
+
 volumes:
   postgres_data:
+  redis_data:  # Redis data volume for persistence
+
