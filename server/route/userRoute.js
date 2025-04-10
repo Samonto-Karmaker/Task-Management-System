@@ -7,6 +7,7 @@ import {
     createUserController,
     getAllUsersController,
     getLoggedInUserController,
+    getUserByIdController,
     loginController,
     logoutController,
     toggleBlockUserController,
@@ -42,5 +43,11 @@ userRouter.patch(
     checkRole(UserPermissions.BLOCK_USER),
     toggleBlockUserController
 );
+userRouter.get(
+    "/:id",
+    checkAuth,
+    checkRole(UserPermissions.VIEW_USER),
+    getUserByIdController
+)
 
 export default userRouter;

@@ -185,3 +185,36 @@ export const toggleBlockUser = async (userId) => {
         throw new ApiError(500, "Internal Server Error");
     }
 };
+
+export const getUserById = async (userId) => {
+    if (!userId) {
+        throw new ApiError(400, "User ID is required");
+    }
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
+                isBlocked: true,
+            },
+        });
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
+        return user;
+    } catch (error) {
+        console.error(error);
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        throw new ApiError(500, "Internal Server Error");
+    }
+};
