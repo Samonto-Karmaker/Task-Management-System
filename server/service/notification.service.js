@@ -50,7 +50,10 @@ export const getInAppNotifications = async (userId) => {
         const notificationIds = notifications.map(
             (notification) => notification.id
         );
-        markNotificationsAsRead(notificationIds);
+        const updateCount = await markNotificationsAsRead(notificationIds);
+        console.log(
+            `Marked ${updateCount} notifications as read for user ${userId}`
+        );
 
         return notifications;
     } catch (error) {
@@ -86,7 +89,7 @@ export const getUnreadNotificationsCount = async (userId) => {
     }
     try {
         const count = await prisma.notification.count({
-            where: { sendToId: userId, isRead: false },
+            where: { sendToId: userId, isRead: false, type: NotificationType.IN_APP },
         });
         return count;
     } catch (error) {
