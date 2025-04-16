@@ -9,6 +9,7 @@ import { ApiResponse } from "@/types/api-response";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/components/custom/hooks/useUser";
+import { useSocket } from "@/components/custom/hooks/useSocket";
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -16,6 +17,7 @@ export default function Login() {
     const { user, setUser } = useUser();
 
     const router = useRouter();
+    useSocket(user?.id);
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
