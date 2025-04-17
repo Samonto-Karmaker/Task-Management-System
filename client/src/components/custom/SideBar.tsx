@@ -10,11 +10,13 @@ import { User } from "@/types/user";
 import { UserPermissions } from "@/utils/constant";
 import { ApiResponse } from "@/types/api-response";
 import apiClient from "@/lib/apiClient";
+import { usePathname } from "next/navigation";
 
 const Sidebar = () => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
     const { user } = useUser();
+    const pathname = usePathname();
 
     const toggleSidebar = () => setIsExpanded(!isExpanded);
 
@@ -41,6 +43,10 @@ const Sidebar = () => {
             fetchUnreadNotificationsCount();
         }
     });
+
+    useEffect(() => {
+        if (pathname === "/notifications") setUnreadNotificationsCount(0);
+    }, [pathname]);
 
     if (!user || !user.roleId) return <></>;
 
