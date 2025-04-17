@@ -3,6 +3,8 @@ import { prisma } from "../db/setupDB.js";
 import { NotificationType } from "../db/setupDB.js";
 import { sendEmail } from "../util/sendEmail.js";
 import { notificationQueue } from "../util/message-queue/queue.js";
+import { redis } from "../util/redis.js";
+import { getSocketIO } from "../util/socket.js";
 
 export const createInAppNotification = async (content, sendTo) => {
     if (!content || !sendTo) {
@@ -89,7 +91,11 @@ export const getUnreadNotificationsCount = async (userId) => {
     }
     try {
         const count = await prisma.notification.count({
-            where: { sendToId: userId, isRead: false, type: NotificationType.IN_APP },
+            where: {
+                sendToId: userId,
+                isRead: false,
+                type: NotificationType.IN_APP,
+            },
         });
         return count;
     } catch (error) {
@@ -99,10 +105,7 @@ export const getUnreadNotificationsCount = async (userId) => {
     }
 };
 
-export const sendInAppNotification = async (
-    notificationId,
-    isRealTime = false
-) => {
+export const sendInAppNotification = async (notificationId) => {
     if (!notificationId) {
         throw new ApiError(400, "Missing required fields");
     }
@@ -116,8 +119,20 @@ export const sendInAppNotification = async (
         }
 
         // Logic to send the notification in real-time (e.g., using WebSocket)
-        if (isRealTime) {
-            // Send notification to the user in real-time
+        // Send notification to the user in real-time
+        const socketId = await redis.get(`socket:${notification.sendToId}`);
+        const io = getSocketIO(); // Get the Socket.IO instance
+        if (socketId && io) {
+            io.to(socketId).emit("notification", {
+                notification: {
+                    id: notification.id,
+                    content: notification.content,
+                    isRead: notification.isRead,
+                },
+            });
+            console.log(`📢 Real-time notification sent to socket ${socketId}`);
+        } else {
+            console.log(`No socket found for user ${notification.sendToId}`);
         }
 
         return notification;
@@ -211,11 +226,14 @@ export const dispatchNotification = async (
         throw new ApiError(400, "Missing required fields");
     }
     try {
-        await notificationQueue.add("sendNotification", {
-            notificationId,
-            type,
-            emailData,
-        });
+        if (type === NotificationType.EMAIL) {
+            await notificationQueue.add("sendNotification", {
+                notificationId,
+                emailData,
+            });
+        } else if (type === NotificationType.IN_APP) {
+            await sendInAppNotification(notificationId);
+        }
         return true;
     } catch (error) {
         console.error(error);
