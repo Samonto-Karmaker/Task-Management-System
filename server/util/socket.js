@@ -1,11 +1,24 @@
 import http from "http";
 import { Server } from "socket.io";
 import { redis } from "./redis.js";
+import ApiError from "./ApiError.js";
+
+let io;
+
+export const getSocketIO = () => {
+    if (!io) {
+        throw new ApiError(
+            500,
+            "Socket.IO not initialized. Ensure the server is running."
+        );
+    }
+    return io;
+};
 
 export const createSocketServer = (app) => {
     const server = http.createServer(app);
 
-    const io = new Server(server, {
+    io = new Server(server, {
         cors: {
             origin: process.env.CORS_ORIGIN || "http://localhost:3000",
             credentials: true,
@@ -61,8 +74,5 @@ export const createSocketServer = (app) => {
         });
     });
 
-    return {
-        server,
-        io,
-    };
+    return server;
 };
