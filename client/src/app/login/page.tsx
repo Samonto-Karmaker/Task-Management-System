@@ -17,7 +17,7 @@ export default function Login() {
     const { user, setUser } = useUser();
 
     const router = useRouter();
-    useSocket(user?.id);
+    const { connectSocket } = useSocket(user?.id);
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -30,6 +30,7 @@ export default function Login() {
             if (loginResponse.success) {
                 setUser(loginResponse.data);
                 alert("Login successful!");
+                connectSocket(); // Connect the socket after successful login
                 router.push("/");
             } else {
                 console.error(loginResponse.message);
@@ -45,7 +46,10 @@ export default function Login() {
         return (
             <div className="text-center text-2xl text-red-500 font-bold">
                 You are already logged in. Go to{" "}
-                <Button className="text-blue-500" onClick={() => router.push("/")}>
+                <Button
+                    className="text-blue-500"
+                    onClick={() => router.push("/")}
+                >
                     Home
                 </Button>{" "}
                 page.

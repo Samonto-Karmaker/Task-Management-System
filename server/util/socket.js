@@ -13,34 +13,51 @@ export const createSocketServer = (app) => {
     });
 
     io.on("connection", (socket) => {
-        console.log(`Socket connected: ${socket.id}`);
+        console.log(`✅ Socket connected: ${socket.id}`);
 
-        // Add user during login
         socket.on("user_connected", async (userId) => {
             try {
-                await redis.set(userId, socket.id, "EX", 86400);
+                await redis.set(`socket:${userId}`, socket.id, "EX", 86400); // 1 day expiry
                 console.log(
                     `User ${userId} connected with socket ID: ${socket.id}`
                 );
             } catch (error) {
-                console.error(`Error adding user to Redis: ${error.message}`);
+                console.error(
+                    `❌ Error adding user to Redis: ${error.message}`
+                );
             }
         });
 
-        // Remove user during logout
         socket.on("user_disconnected", async (userId) => {
             try {
-                await redis.del(userId);
+                await redis.del(`socket:${userId}`);
                 console.log(`User ${userId} disconnected`);
             } catch (error) {
-                console.error(`Error removing user from Redis: ${error.message}`);
+                console.error(
+                    `❌ Error removing user from Redis: ${error.message}`
+                );
             }
         });
 
-        // Handle socket disconnection
         socket.on("disconnect", async () => {
-            console.log(`Socket disconnected: ${socket.id}`);
-            // Optionally, clean up Redis entries for this socket ID
+            console.log(`❌ Socket disconnected: ${socket.id}`);
+            try {
+                const keys = await redis.keys("socket:*");
+                for (const key of keys) {
+                    const value = await redis.get(key); // now safe
+                    if (value === socket.id) {
+                        await redis.del(key);
+                        console.log(
+                            `🧹 Cleaned up Redis entry for user: ${key}`
+                        );
+                        break;
+                    }
+                }
+            } catch (error) {
+                console.error(
+                    `❌ Error cleaning up Redis on disconnect: ${error.message}`
+                );
+            }
         });
     });
 
