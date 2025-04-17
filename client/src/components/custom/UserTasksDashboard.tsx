@@ -146,8 +146,8 @@ export default function UserTasksDashboardPage({
                                     ) : (
                                         <span className="text-gray-500">
                                             {isAssigneeView
-                                                ? task.assignee?.name || "N/A"
-                                                : task.assigner?.name || "N/A"}
+                                                ? task.assigner?.name || "N/A"
+                                                : task.assignee?.name || "N/A"}
                                         </span>
                                     )}
                                 </TableCell>
