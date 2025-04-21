@@ -10,7 +10,7 @@ import { useSocket } from "./hooks/useSocket";
 
 export default function Header() {
     const { user, setUser } = useUser();
-    const { disconnectSocket } = useSocket(user?.id);
+    const { disconnectSocket } = useSocket();
     const router = useRouter();
 
     const handleLogout = async () => {

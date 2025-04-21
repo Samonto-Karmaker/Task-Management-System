@@ -17,7 +17,7 @@ export default function Login() {
     const { user, setUser } = useUser();
 
     const router = useRouter();
-    const { connectSocket } = useSocket(user?.id);
+    const { connectSocket } = useSocket();
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
