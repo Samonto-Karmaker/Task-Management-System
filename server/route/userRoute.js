@@ -24,7 +24,7 @@ userRouter.post(
     "/",
     checkAuth,
     checkRole(UserPermissions.CREATE_USER),
-    createUserValidator,
+    createUserValidator(false),
     createUserValidationResult,
     createUserController
 );
