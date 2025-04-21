@@ -8,18 +8,19 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(uuid())
-  email         String         @unique
-  name          String
-  password      String
-  isBlocked     Boolean        @default(false)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  notifications Notification[]
-  assignedTasks Task[]         @relation("assignee")
-  createdTasks  Task[]         @relation("assigner")
-  role          Role           @relation(fields: [roleId], references: [id])
-  roleId        String
+  id                 String         @id @default(uuid())
+  email              String         @unique
+  name               String
+  password           String
+  isBlocked          Boolean        @default(false)
+  mustChangePassword Boolean        @default(false)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  notifications      Notification[]
+  assignedTasks      Task[]         @relation("assignee")
+  createdTasks       Task[]         @relation("assigner")
+  role               Role           @relation(fields: [roleId], references: [id])
+  roleId             String
 
   @@index([email]) // Index on email for quick lookups by email
   @@index([roleId]) // Index on roleId for quick lookups by role
