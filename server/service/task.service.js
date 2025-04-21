@@ -268,6 +268,9 @@ export const getAllTasks = async () => {
                     },
                 },
             },
+            orderBy: {
+                createdAt: "desc",
+            }
         });
 
         return tasks;
@@ -296,6 +299,9 @@ export const getTasksByAssigner = async (userId) => {
                     },
                 },
             },
+            orderBy: {
+                createdAt: "desc",
+            }
         });
 
         return tasks;
@@ -325,6 +331,9 @@ export const getTasksByAssignee = async (userId) => {
                     },
                 },
             },
+            orderBy: {
+                createdAt: "desc",
+            }
         });
 
         return tasks;

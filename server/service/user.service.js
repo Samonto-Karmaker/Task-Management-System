@@ -59,6 +59,9 @@ export const getAllUsers = async () => {
                 role: true,
                 isBlocked: true,
             },
+            orderBy: {
+                updatedAt: "desc",
+            },
         });
         return users;
     } catch (error) {
