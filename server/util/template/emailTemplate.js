@@ -188,4 +188,27 @@ TaskPro Team`,
             `,
         };
     },
+
+    PASSWORD_CHANGED: (userName) => {
+        if (!userName) {
+            throw new ApiError(
+                400,
+                "Missing required parameter for PASSWORD_CHANGED template"
+            );
+        }
+        return {
+            subject: `Your Password Has Been Changed`,
+            body: `Hi ${userName},
+  
+Your password has been successfully changed. If you did not make this change, please contact support immediately.
+
+Regards,  
+TaskPro Team`,
+            html: `
+                <p>Hi <strong>${userName}</strong>,</p>
+                <p>Your password has been successfully changed. If you did not make this change, please contact support immediately.</p>
+                <p>Regards,<br>TaskPro Team</p>
+            `,
+        };
+    },
 };
