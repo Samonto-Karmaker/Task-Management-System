@@ -221,3 +221,51 @@ export const getUserById = async (userId) => {
         throw new ApiError(500, "Internal Server Error");
     }
 };
+
+export const changePassword = async (userId, newPassword) => {
+    if (!userId || !newPassword) {
+        throw new ApiError(400, "User ID and new password are required");
+    }
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { password: true },
+        });
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
+        const isSamePassword = await bcrypt.compare(newPassword, user.password);
+        if (isSamePassword) {
+            throw new ApiError(
+                400,
+                "New password cannot be the same as the old password"
+            );
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        const updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: { password: hashedPassword },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+            },
+        });
+
+        if (updatedUser) {
+            const emailData = EmailTemplates.PASSWORD_CHANGED(updatedUser.name);
+            notifyEmail(userId, emailData).catch((error) => {
+                console.error("Failed to send email:", error);
+            });
+        }
+
+        return updatedUser;
+    } catch (error) {
+        console.error(error);
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        throw new ApiError(500, "Internal Server Error");
+    }
+};
