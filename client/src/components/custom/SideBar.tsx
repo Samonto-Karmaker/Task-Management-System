@@ -73,9 +73,9 @@ const Sidebar = () => {
     return (
         <div className="flex">
             <aside
-                className={`flex flex-col bg-gray-900 text-white min-h-screen p-4 transition-all ${
+                className={`sticky top-0 left-0 flex flex-col bg-gray-900 text-white h-screen p-4 transition-all ${
                     isExpanded ? "w-60" : "w-16"
-                } sticky top-0`}
+                }`}
             >
                 <Button
                     variant="ghost"
