@@ -11,11 +11,14 @@ import { UserPermissions } from "@/utils/constant";
 import { ApiResponse } from "@/types/api-response";
 import apiClient from "@/lib/apiClient";
 import { usePathname } from "next/navigation";
+import { useSocket } from "./hooks/useSocket";
 
 const Sidebar = () => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
     const { user } = useUser();
+    const { socket } = useSocket();
+
     const pathname = usePathname();
 
     const toggleSidebar = () => setIsExpanded(!isExpanded);
@@ -43,6 +46,23 @@ const Sidebar = () => {
             fetchUnreadNotificationsCount();
         }
     });
+
+    useEffect(() => {
+        if (socket && socket.connected) {
+            socket.on("notification", () => {
+                setUnreadNotificationsCount((prevCount) => prevCount + 1);
+            });
+            console.log("Socket connected for notifications");
+        } else {
+            console.log("Socket not connected for notifications");
+        }
+
+        return () => {
+            if (socket) {
+                socket.off("notification");
+            }
+        };
+    }, [socket, socket?.connected]);
 
     useEffect(() => {
         if (pathname === "/notifications") setUnreadNotificationsCount(0);
