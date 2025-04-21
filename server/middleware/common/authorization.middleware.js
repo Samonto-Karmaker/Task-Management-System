@@ -12,6 +12,15 @@ export const checkAuth = (req, res, next) => {
         const token = cookies[process.env.COOKIE_NAME];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
+
+        const pathname = req.url.split("?")[0].replace(/\/$/, ""); // Remove trailing slash
+        const url = pathname.split("/").pop();
+
+        if (req.user.mustChangePassword && url !== "change-password") {
+            return res
+                .status(401)
+                .json(new ApiResponse(401, "Password must be changed"));
+        }
         next();
     } catch (error) {
         console.error(error);
@@ -51,4 +60,4 @@ export const checkRole = (requiredPermission) => async (req, res, next) => {
             .status(500)
             .json(new ApiResponse(500, "Internal Server Error"));
     }
-}
+};

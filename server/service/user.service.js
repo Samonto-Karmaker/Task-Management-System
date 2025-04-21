@@ -24,7 +24,13 @@ export const createUser = async ({ name, email, password, roleId }) => {
 
         // Create user
         const newUser = await prisma.user.create({
-            data: { name, email, password: hashedPassword, roleId },
+            data: {
+                name,
+                email,
+                password: hashedPassword,
+                roleId,
+                mustChangePassword: true,
+            },
         });
 
         // Send email notification
@@ -77,6 +83,15 @@ export const login = async ({ email, password }) => {
     try {
         const user = await prisma.user.findUnique({
             where: { email },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                mustChangePassword: true,
+                password: true,
+                roleId: true,
+                isBlocked: true,
+            },
         });
         if (!user) {
             throw new ApiError(401, "Invalid credentials");
