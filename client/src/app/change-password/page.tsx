@@ -6,31 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import apiClient from "@/lib/apiClient";
 import { ApiResponse } from "@/types/api-response";
-import { useState, FormEvent, useEffect } from "react";
-import { useUser } from "@/components/custom/hooks/useUser";
-import { useSocket } from "@/components/custom/hooks/useSocket";
+import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
 export default function ChangePasswordPage() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-
-    const { user, setUser } = useUser();
-    const { connectSocket } = useSocket();
     const router = useRouter();
-
-    const [loggedInUser, setLoggedInUser] = useState(user);
-
-    useEffect(() => {
-        if (!user) {
-            const storedUser = localStorage.getItem("user");
-            if (!storedUser) {
-                router.push("/login");
-                return;
-            }
-            setLoggedInUser(JSON.parse(storedUser));
-        }
-    }, [user, router]);
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -46,15 +28,13 @@ export default function ChangePasswordPage() {
                 }
             );
             if (response.success) {
-                alert("Password changed successfully!");
-                setUser(loggedInUser);
-                localStorage.removeItem("user");
-                connectSocket(); // Connect the socket after changing password
-                router.push("/");
+                alert(
+                    "Password changed successfully! Please login again with updated credentials"
+                );
+                router.push("/login");
             } else {
                 console.error(response.message);
                 alert(`Error: ${response.message}`);
-                router.push("/login");
             }
         } catch (error) {
             console.error(error);

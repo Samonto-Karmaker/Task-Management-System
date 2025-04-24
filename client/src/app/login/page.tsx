@@ -29,7 +29,6 @@ export default function Login() {
             });
             if (loginResponse.success) {
                 if (loginResponse.data.mustChangePassword) {
-                    localStorage.setItem("user", JSON.stringify(loginResponse.data));
                     alert("You must change your password before logging in.");
                     router.push("/change-password");
                     return;

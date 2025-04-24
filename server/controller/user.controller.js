@@ -96,8 +96,9 @@ export const changePasswordController = async (req, res) => {
     const { id } = req.user;
     try {
         const updatedUser = await changePassword(id, password);
+        res.clearCookie(process.env.COOKIE_NAME);
         res.status(200).json(
-            new ApiResponse(200, "Password changed", updatedUser)
+            new ApiResponse(200, "Password changed")
         );
     } catch (error) {
         finalResErrorHandler(error, res);
