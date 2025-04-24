@@ -28,6 +28,12 @@ export default function Login() {
                 password,
             });
             if (loginResponse.success) {
+                if (loginResponse.data.mustChangePassword) {
+                    localStorage.setItem("user", JSON.stringify(loginResponse.data));
+                    alert("You must change your password before logging in.");
+                    router.push("/change-password");
+                    return;
+                }
                 setUser(loginResponse.data);
                 alert("Login successful!");
                 connectSocket(); // Connect the socket after successful login
