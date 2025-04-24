@@ -6,6 +6,7 @@ export type User = {
     name: string;
     roleId: string;
     isBlocked: boolean;
+    mustChangePassword: boolean;
     createdAt: string;
     updatedAt: string;
     permissionInfo: {
