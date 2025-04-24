@@ -5,6 +5,7 @@ import {
     login,
     toggleBlockUser,
     getUserById,
+    changePassword,
 } from "../service/user.service.js";
 import jwt from "jsonwebtoken";
 import ms from "ms";
@@ -72,7 +73,9 @@ export const toggleBlockUserController = async (req, res) => {
     const { id } = req.params;
     try {
         const user = await toggleBlockUser(id);
-        res.status(200).json(new ApiResponse(200, "User blocked/unblocked", user));
+        res.status(200).json(
+            new ApiResponse(200, "User blocked/unblocked", user)
+        );
     } catch (error) {
         finalResErrorHandler(error, res);
     }
@@ -83,6 +86,19 @@ export const getUserByIdController = async (req, res) => {
     try {
         const user = await getUserById(id);
         res.status(200).json(new ApiResponse(200, "User retrieved", user));
+    } catch (error) {
+        finalResErrorHandler(error, res);
+    }
+};
+
+export const changePasswordController = async (req, res) => {
+    const { password } = req.body;
+    const { id } = req.user;
+    try {
+        const updatedUser = await changePassword(id, password);
+        res.status(200).json(
+            new ApiResponse(200, "Password changed", updatedUser)
+        );
     } catch (error) {
         finalResErrorHandler(error, res);
     }

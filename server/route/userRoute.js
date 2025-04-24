@@ -4,6 +4,7 @@ import {
     createUserValidator,
 } from "../middleware/user/createUserValidator.middleware.js";
 import {
+    changePasswordController,
     createUserController,
     getAllUsersController,
     getLoggedInUserController,
@@ -48,6 +49,13 @@ userRouter.get(
     checkAuth,
     checkRole(UserPermissions.VIEW_USER),
     getUserByIdController
-)
+);
+userRouter.patch(
+    "/change-password",
+    checkAuth,
+    createUserValidator(true),
+    createUserValidationResult,
+    changePasswordController
+);
 
 export default userRouter;
