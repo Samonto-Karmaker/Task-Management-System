@@ -4,11 +4,63 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import apiClient from "@/lib/apiClient";
+import { ApiResponse } from "@/types/api-response";
+import { useState, FormEvent, useEffect } from "react";
+import { useUser } from "@/components/custom/hooks/useUser";
+import { useSocket } from "@/components/custom/hooks/useSocket";
+import { useRouter } from "next/navigation";
 
 export default function ChangePasswordPage() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+
+    const { user, setUser } = useUser();
+    const { connectSocket } = useSocket();
+    const router = useRouter();
+
+    const [loggedInUser, setLoggedInUser] = useState(user);
+
+    useEffect(() => {
+        if (!user) {
+            const storedUser = localStorage.getItem("user");
+            if (!storedUser) {
+                router.push("/login");
+                return;
+            }
+            setLoggedInUser(JSON.parse(storedUser));
+        }
+    }, [user, router]);
+
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+        if (password !== confirmPassword) {
+            alert("Passwords do not match");
+            return;
+        }
+        try {
+            const response: ApiResponse = await apiClient.patch(
+                "/change-password",
+                {
+                    password,
+                }
+            );
+            if (response.success) {
+                alert("Password changed successfully!");
+                setUser(loggedInUser);
+                localStorage.removeItem("user");
+                connectSocket(); // Connect the socket after changing password
+                router.push("/");
+            } else {
+                console.error(response.message);
+                alert(`Error: ${response.message}`);
+                router.push("/login");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("An error occurred. Please try again later.");
+        }
+    };
 
     return (
         <div className="max-w-md mx-auto">
@@ -19,7 +71,7 @@ export default function ChangePasswordPage() {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <form className="space-y-4">
+                    <form className="space-y-4" onSubmit={handleSubmit}>
                         <div className="space-y-2">
                             <Label htmlFor="password">Password</Label>
                             <Input
